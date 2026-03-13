@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSAFY 운영 가이드</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <script src="assets/ssafy-docs.js"></script>
+  <link rel="stylesheet" href="assets/ssafy-docs.css" />
+  <style>
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+    }
+
+    .chip-row,
+    .inline-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip,
+    .inline-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--card-border));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--card-bg) 88%, transparent);
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+
+    .inline-link {
+      color: var(--text-primary);
+    }
+
+    .chip:hover,
+    .inline-link:hover {
+      border-color: color-mix(in srgb, var(--accent) 35%, var(--card-border));
+      color: var(--text-primary);
+    }
+
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(18px);
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent);
+    }
+
+    .section-desc {
+      font-size: 0.96rem;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+      line-height: 1.68;
+    }
+
+    .response-grid,
+    .callout-grid,
+    .check-grid,
+    .failure-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .response-card,
+    .callout-card,
+    .check-card,
+    .failure-card {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+    }
+
+    .response-card h3,
+    .callout-card h3,
+    .check-card h3,
+    .failure-card h3,
+    .timeline-content h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .response-card p,
+    .callout-card p,
+    .check-card p,
+    .failure-card p,
+    .timeline-content p,
+    .timeline-content li {
+      color: var(--text-secondary);
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .step-list,
+    .check-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 0.92rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 48px;
+      margin-top: 24px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--card-border);
+      border-radius: 4px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    .timeline-badge {
+      position: absolute;
+      left: -48px;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.05rem;
+      border: 6px solid var(--card-bg);
+      box-shadow: var(--shadow-sm);
+      z-index: 2;
+    }
+
+    .timeline-content h4 {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .command-block {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 0.88rem;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      overflow-x: auto;
+      margin: 14px 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 0.88em;
+      font-weight: 700;
+    }
+
+    [data-theme="dark"] code {
+      color: var(--accent-light);
+    }
+
+    .command-comment {
+      color: #94a3b8;
+    }
+
+    .command-cmd {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: 44px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding-bottom: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .timeline {
+        padding-left: 32px;
+      }
+
+      .timeline::before {
+        left: 10px;
+      }
+
+      .timeline-badge {
+        left: -32px;
+        width: 28px;
+        height: 28px;
+        font-size: 0.88rem;
+        border-width: 4px;
+      }
+
+      .response-grid,
+      .callout-grid,
+      .check-grid,
+      .failure-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg style="display:none">
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
+    <symbol id="icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
+    <symbol id="icon-guide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="5" r="2"></circle><path d="M8 19h4a4 4 0 0 0 4-4V7"></path><path d="M16 5h-4a4 4 0 0 0-4 4v2"></path></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"></path></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></symbol>
+  </svg>
+
+  <main class="container">
+    <nav class="main-nav">
+      <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="dashboard-index.html" class="nav-link">인덱스</a>
+        <a href="infra-dashboard.html" class="nav-link">대시보드</a>
+        <a href="infra-architecture.html" class="nav-link">아키텍처</a>
+        <a href="infra-runbook.html" class="nav-link active">운영 가이드</a>
+        <a href="infra-conventions.html" class="nav-link">컨벤션</a>
+      </div>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun"><use href="#icon-sun"></use></svg>
+          <svg id="iconMoon"><use href="#icon-moon"></use></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg id="iconHamburger"><use href="#icon-hamburger"></use></svg>
+          <svg id="iconClose" style="display:none;"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+    </nav>
+
+    <header class="hero reveal-on-scroll">
+      <h1 class="hero-title">운영 상태에서 실제 실행으로 이어지는 가이드</h1>
+      <p class="hero-sub">대시보드는 현재 상태를 보여주고, 이 문서는 점검과 복구 순서를 제공합니다. 구조는 아키텍처, 정책 원문은 컨벤션을 기준으로 확인합니다.</p>
+      <div class="chip-row">
+        <a class="chip" href="#triage">상태별 대응</a>
+        <a class="chip" href="#precheck">사전 점검</a>
+        <a class="chip" href="#procedures">핵심 절차</a>
+        <a class="chip" href="#validation">검증/복구</a>
+      </div>
+    </header>
+
+    <section class="section reveal-on-scroll" id="triage">
+      <h2 class="section-title"><svg><use href="#icon-route"></use></svg>상태별 대응 경로</h2>
+      <p class="section-desc">먼저 대시보드에서 어떤 경고인지 분류하고, 구조 설명이 필요하면 아키텍처로, 금지/허용 기준이 필요하면 컨벤션으로 이동합니다. 이 페이지는 실제 점검 순서만 담당합니다.</p>
+      <div class="response-grid">
+        <article class="response-card">
+          <span class="eyebrow">Upstream WARN</span>
+          <h3>app upstream가 WARN일 때</h3>
+          <p>먼저 라우팅과 포트 기준이 맞는지 확인한 뒤, 앱과 프록시 순서로 점검합니다.</p>
+          <ol class="step-list">
+            <li>아키텍처에서 <code>7101~7103 / 7201~7203</code> 경계를 재확인</li>
+            <li>Nginx upstream, 앱 컨테이너, health endpoint 순서로 점검</li>
+            <li>조치 후 대시보드 데이터를 다시 갱신</li>
+          </ol>
+          <div class="inline-links">
+            <a class="inline-link" href="infra-dashboard.html">대시보드</a>
+            <a class="inline-link" href="infra-architecture.html">아키텍처</a>
+          </div>
+        </article>
+        <article class="response-card">
+          <span class="eyebrow">Exposure WARN</span>
+          <h3>보안 노출이 의심될 때</h3>
+          <p>공개 포트와 bind 주소부터 확인합니다. 정책 확인 없이 방화벽만 만지지 않습니다.</p>
+          <ol class="step-list">
+            <li>컨벤션에서 public 허용 포트와 금지 포트 기준 확인</li>
+            <li>UFW, Nginx ACL, Jenkins loopback bind 상태를 순서대로 점검</li>
+            <li>Tailscale 접근 경로와 외부 노출 경로를 분리해서 수정</li>
+          </ol>
+          <div class="inline-links">
+            <a class="inline-link" href="infra-conventions.html">컨벤션</a>
+            <a class="inline-link" href="#procedures">관련 절차</a>
+          </div>
+        </article>
+        <article class="response-card">
+          <span class="eyebrow">Deploy Gap</span>
+          <h3>서비스와 DB가 미배포일 때</h3>
+          <p>main/dev 분리 원칙을 유지한 채 런타임과 데이터 계층을 순서대로 올립니다.</p>
+          <ol class="step-list">
+            <li>Docker 런타임과 네트워크 준비 상태 확인</li>
+            <li>DB/Redis 포트가 <code>7432/7379</code>, <code>8432/8379</code> 기준인지 확인</li>
+            <li>앱 컨테이너 배포 후 Nginx와 healthz를 다시 확인</li>
+          </ol>
+          <div class="inline-links">
+            <a class="inline-link" href="infra-dashboard.html">현재 상태</a>
+            <a class="inline-link" href="infra-architecture.html">구조 기준</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section reveal-on-scroll" id="precheck">
+      <h2 class="section-title"><svg><use href="#icon-lock"></use></svg>사전 점검</h2>
+      <p class="section-desc">실제 설치나 점검 전에 로컬 자산, 접근 정보, 원격 선행 검사를 먼저 맞춥니다. 아래 단계는 <code>docs/runbooks/PRECHECK_AND_ACCESS.md</code>를 기반으로 운영 화면용 요약만 추린 것입니다.</p>
+      <div class="callout-grid">
+        <article class="callout-card">
+          <h3>1. 로컬 자산 동기화</h3>
+          <p>Windows 기준으로 키와 백업 자산을 먼저 맞춥니다.</p>
+          <div class="command-block"><span class="command-cmd">powershell -ExecutionPolicy Bypass -File .\scripts\local\prepare-local.ps1</span></div>
+          <ul class="check-list">
+            <li><code>.local-assets/keys/J14A408T.pem</code> 존재</li>
+            <li><code>.local-assets/backup/ssafy-ec2-backup</code> 존재</li>
+          </ul>
+        </article>
+        <article class="callout-card">
+          <h3>2. 환경 변수 점검</h3>
+          <p><code>.env.example</code>를 기준으로 원격 접근과 프록시 항목을 우선 확인합니다.</p>
+          <ul class="check-list">
+            <li><code>EC2_HOST</code>, <code>EC2_USER</code>, <code>EC2_SSH_PORT</code></li>
+            <li><code>NGINX_SERVER_NAME</code>, <code>APP_UPSTREAM</code></li>
+            <li><code>ENABLE_JENKINS_PATH</code>, <code>JENKINS_UPSTREAM</code>, <code>JENKINS_ALLOW_CIDR</code></li>
+            <li>필요 시 <code>TAILSCALE_AUTH_KEY</code>, <code>ENABLE_SSM</code></li>
+          </ul>
+        </article>
+        <article class="callout-card">
+          <h3>3. 접근/선행 검사</h3>
+          <p>SSH 접속과 원격 preflight가 통과해야 다음 단계로 넘어갑니다.</p>
+          <div class="command-block"><span class="command-comment"># Windows OpenSSH</span>
+<span class="command-cmd">ssh -i .\.local-assets\keys\J14A408T.pem ubuntu@&lt;EC2_HOST&gt;</span>
+
+<span class="command-comment"># EC2 접속 후</span>
+<span class="command-cmd">bash scripts/ec2/preflight-check.sh</span></div>
+        </article>
+      </div>
+      <div class="inline-links">
+        <a class="inline-link" href="infra-dashboard.html">상태 먼저 보기</a>
+        <a class="inline-link" href="infra-conventions.html">정책 확인</a>
+      </div>
+    </section>
+
+    <section class="section reveal-on-scroll" id="procedures">
+      <h2 class="section-title"><svg><use href="#icon-guide"></use></svg>핵심 운영 절차</h2>
+      <p class="section-desc">아래 순서는 인프라 기본선과 운영 접근 경로를 복원하거나 새로 맞출 때 사용하는 기본 절차입니다. main/dev 분리와 내부 포트 비공개 원칙은 깨지지 않아야 합니다.</p>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-badge">1</div>
+          <div class="timeline-content">
+            <h3>SSH 보안 설정</h3>
+            <h4>왜 필요한가</h4>
+            <p>root 직접 로그인과 비밀번호 인증을 막아 불필요한 공격 표면을 줄입니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># SSH 설정 파일 확인</span>
+<span class="command-cmd">sudo vi /etc/ssh/sshd_config</span>
+
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+<span class="command-comment"># 문법 검사 후 재시작</span>
+<span class="command-cmd">sudo sshd -t</span>
+<span class="command-cmd">sudo systemctl restart sshd</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-badge">2</div>
+          <div class="timeline-content">
+            <h3>UFW 방화벽 설정</h3>
+            <h4>왜 필요한가</h4>
+            <p>DB, Redis, Jenkins, 내부 앱 포트가 외부에 직접 노출되지 않도록 기본 경계를 만듭니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># 기본 정책</span>
+<span class="command-cmd">sudo ufw default deny incoming</span>
+
+<span class="command-comment"># 공개 포트만 허용</span>
+<span class="command-cmd">sudo ufw allow 22/tcp</span>
+<span class="command-cmd">sudo ufw allow 80/tcp</span>
+<span class="command-cmd">sudo ufw allow 443/tcp</span>
+
+<span class="command-comment"># 필요 시 Tailscale UDP</span>
+<span class="command-cmd">sudo ufw allow 41641/udp</span>
+<span class="command-cmd">sudo ufw enable</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-badge">3</div>
+          <div class="timeline-content">
+            <h3>Docker 런타임 준비</h3>
+            <h4>왜 필요한가</h4>
+            <p>FE/BE/AI/DB/Redis를 환경별로 독립 실행하고 main/dev를 네트워크 단위까지 분리하기 위함입니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># Docker 엔진 및 Compose 설치</span>
+<span class="command-cmd">curl -fsSL https://get.docker.com | sudo sh</span>
+<span class="command-cmd">sudo usermod -aG docker $USER</span>
+
+<span class="command-comment"># 확인</span>
+<span class="command-cmd">docker --version</span>
+<span class="command-cmd">docker compose version</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-badge">4</div>
+          <div class="timeline-content">
+            <h3>Nginx 리버스 프록시</h3>
+            <h4>왜 필요한가</h4>
+            <p>Nginx는 유일한 public entrypoint이며, FE/main/dev 라우팅과 Jenkins 접근 제한의 기준점입니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># 예시 라우팅</span>
+location / {
+    proxy_pass http://127.0.0.1:7102;
+}
+location /dev/ {
+    proxy_pass http://127.0.0.1:7202;
+}
+location /jenkins/ {
+    allow 100.64.0.0/10;
+    allow 127.0.0.1;
+    deny all;
+}</div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-badge">5</div>
+          <div class="timeline-content">
+            <h3>Jenkins 운영 접근</h3>
+            <h4>왜 필요한가</h4>
+            <p>도메인별 CI/CD를 수행하되 Jenkins 자체는 public service가 아니라 내부 관리 도구로 유지해야 합니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># loopback bind 유지</span>
+<span class="command-cmd">JENKINS_OPTS=--httpListenAddress=127.0.0.1</span>
+
+<span class="command-comment"># 확인</span>
+<span class="command-cmd">ss -ltnp | grep 8080</span>
+<span class="command-cmd">systemctl status jenkins --no-pager</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-badge">6</div>
+          <div class="timeline-content">
+            <h3>Tailscale 운영 채널</h3>
+            <h4>왜 필요한가</h4>
+            <p>Jenkins와 기타 내부 관리 도구는 Nginx 제한 또는 Tailscale을 통해서만 접근해야 합니다.</p>
+            <h4>어떻게 적용하나</h4>
+            <div class="command-block"><span class="command-comment"># 설치 및 접속</span>
+<span class="command-cmd">curl -fsSL https://tailscale.com/install.sh | sh</span>
+<span class="command-cmd">sudo tailscale up</span>
+<span class="command-cmd">tailscale ip -4</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal-on-scroll" id="validation">
+      <h2 class="section-title"><svg><use href="#icon-refresh"></use></svg>검증 및 복구 후 확인</h2>
+      <p class="section-desc">조치가 끝났으면 시스템 상태와 대시보드 지표를 다시 맞춰야 합니다. 런타임만 정상이고 대시보드가 오래된 데이터면 운영 판단이 어긋납니다.</p>
+      <div class="check-grid">
+        <article class="check-card">
+          <h3>서비스 상태 확인</h3>
+          <div class="command-block"><span class="command-cmd">systemctl status docker --no-pager</span>
+<span class="command-cmd">systemctl status nginx --no-pager</span>
+<span class="command-cmd">systemctl status jenkins --no-pager</span>
+<span class="command-cmd">systemctl status tailscaled --no-pager</span></div>
+        </article>
+        <article class="check-card">
+          <h3>대시보드 데이터 갱신</h3>
+          <div class="command-block"><span class="command-cmd">pwsh -File scripts/local/refresh-infra-dashboard-data.ps1 -HostAlias ssafy-ec2</span></div>
+          <p>갱신 후 <code>app upstream</code>, <code>security exposure</code>, <code>jenkins loopback</code> 항목이 기대 상태인지 다시 봅니다.</p>
+        </article>
+        <article class="check-card">
+          <h3>금지 포트 재확인</h3>
+          <p><code>5432 / 6379 / 3306 / 27017 / 8080</code>의 public bind는 금지입니다. Jenkins는 항상 loopback이어야 합니다.</p>
+          <p>앱 포트 <code>7101~7203</code>, 데이터 포트 <code>7432 / 7379 / 8432 / 8379</code>도 외부 공개 대상이 아닙니다.</p>
+        </article>
+        <article class="check-card">
+          <h3>데이터 분리 검증</h3>
+          <p>main은 <code>7432 / 7379</code>, dev는 <code>8432 / 8379</code>를 사용합니다. cross-environment 접근은 허용하지 않습니다.</p>
+          <div class="inline-links">
+            <a class="inline-link" href="infra-architecture.html">구조 기준</a>
+            <a class="inline-link" href="infra-conventions.html">정책 기준</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section reveal-on-scroll">
+      <h2 class="section-title"><svg><use href="#icon-alert"></use></svg>실패 시 우선 확인</h2>
+      <p class="section-desc">다음 항목은 실제 장애 대응에서 먼저 보는 체크포인트입니다. 전체 설치 재시도보다 원인 지점을 먼저 좁히는 데 목적이 있습니다.</p>
+      <div class="failure-grid">
+        <article class="failure-card">
+          <h3>Jenkins 설치 실패</h3>
+          <p>Java 버전, Jenkins apt repo 키, loopback bind 설정을 먼저 다시 확인합니다.</p>
+        </article>
+        <article class="failure-card">
+          <h3>Tailscale 연결 실패</h3>
+          <p><code>TAILSCALE_AUTH_KEY</code> 재발급 여부와 기존 노드 중복 등록 상태를 먼저 확인합니다.</p>
+        </article>
+        <article class="failure-card">
+          <h3>SSH 재시작 실패</h3>
+          <p><code>/etc/ssh/sshd_config.d/99-ssafy-hardening.conf</code>를 점검하고 <code>sshd -t</code>를 통과시키기 전에는 재기동하지 않습니다.</p>
+        </article>
+        <article class="failure-card">
+          <h3>SSM 미연결</h3>
+          <p>EC2 instance profile의 <code>AmazonSSMManagedInstanceCore</code>, 시간 동기화, 에이전트 상태를 함께 봅니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="next-step-container reveal-on-scroll">
+      <a href="infra-conventions.html" class="next-page-trigger">
+        <div class="next-step-label">Next Step</div>
+        <h2 class="next-step-title">인프라 컨벤션 확인하기</h2>
+        <p class="next-step-desc">포트, 네이밍, 브랜치, 보안 정책 등 팀이 준수해야 할 표준 규정을 확인하세요.</p>
+        <div class="next-step-icon">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </section>
+
+    <footer class="reveal-on-scroll">
+      SSAFY A408 Operations Guide &copy; 2026
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,167 +1,70 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-reload-on-theme-toggle="true">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SSAFY 인프라 아키텍처 가이드</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <script src="assets/ssafy-docs.js"></script>
+  <script>const NEXT_PAGE = 'infra-runbook.html';</script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <style>
-    :root {
-      --bg: #f8fafc;
-      --bg-glass: rgba(248, 250, 252, 0.75);
-      --card-bg: rgba(255, 255, 255, 0.8);
-      --card-border: rgba(0, 0, 0, 0.08);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #64748b;
-      --accent: #4f46e5;
-      --accent-light: #6366f1;
-      --accent-glow: rgba(79, 70, 229, 0.2);
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.06);
-      --radius: 12px;
-      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-      --gradient-bg: radial-gradient(circle at 100% 0%, #f0f9ff 0%, #f8fafc 50%, #faf5ff 100%);
-      --main-color: #2563eb;
-      --dev-color: #f97316;
-      --danger-color: #ef4444;
-      --ok-color: #22c55e;
-    }
-    [data-theme="dark"] {
-      --bg: #0a0a0f;
-      --bg-glass: rgba(10, 10, 15, 0.6);
-      --card-bg: rgba(24, 24, 33, 0.7);
-      --card-border: rgba(255, 255, 255, 0.1);
-      --text-primary: #f8fafc;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
-      --accent: #818cf8;
-      --accent-light: #a78bfa;
-      --accent-glow: rgba(99, 102, 241, 0.3);
-      --gradient-bg: radial-gradient(circle at 0% 100%, #0a0a0f 0%, #171c2c 50%, #0a0a0f 100%);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
-      background-color: var(--bg);
-      background-image: var(--gradient-bg);
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      transition: background var(--transition), color var(--transition);
-    }
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .hero { text-align: center; margin-bottom: 40px; padding: 20px 0; }
+    .section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; backdrop-filter: blur(18px); }
+    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .section-title svg { width: 24px; height: 24px; stroke: var(--accent); }
+    .section-desc { color: var(--text-secondary); margin-bottom: 18px; line-height: 1.7; }
 
-    /* Nav */
-    .main-nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 24px; margin-bottom: 32px;
-      background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--card-border); border-radius: var(--radius);
-      position: sticky; top: 16px; z-index: 100;
-    }
-    .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
-    .nav-logo-accent { color: var(--accent); }
-    .nav-links { display: flex; gap: 16px; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 12px; transition: all var(--transition); border-radius: 8px; }
-    .nav-link:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
-    .nav-link.active { color: white; background: var(--accent); }
-    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
-    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
-    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
+    .mermaid-wrap { background: #ffffff; border-radius: 14px; padding: 20px; border: 1px solid #e2e8f0; overflow-x: auto; }
+    [data-theme="dark"] .mermaid-wrap { background: #1e1e2e; border-color: rgba(255,255,255,0.1); }
 
-    /* Hero */
-    .hero {
-      font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em;
-      background: var(--gradient-hero); -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 8px; line-height: 1.2; text-align: center;
-    }
-    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .card { border: 1px solid var(--card-border); border-radius: 16px; padding: 18px; background: color-mix(in srgb, var(--card-bg) 88%, transparent); }
+    .card h3 { font-size: 1rem; margin-bottom: 8px; }
+    .card p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; }
 
-    /* Section */
-    .section {
-      background: var(--card-bg); backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border); border-radius: var(--radius);
-      padding: 28px; margin-bottom: 24px;
-    }
-    .section-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; }
-    .section-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px; }
-
-    /* Mermaid container */
-    .mermaid-wrap {
-      background: #ffffff; border-radius: 10px; padding: 20px;
-      border: 1px solid #e2e8f0; overflow-x: auto;
-    }
-    [data-theme="dark"] .mermaid-wrap {
-      background: #1e1e2e; border-color: rgba(255,255,255,0.1);
-    }
-
-    /* Table */
-    .port-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
-    .port-table th, .port-table td { border: 1px solid var(--card-border); padding: 10px 14px; text-align: left; }
-    .port-table th { background: var(--accent-glow); font-weight: 600; }
-    .port-table tr:hover { background: var(--accent-glow); }
-    .badge-public { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #dcfce7; color: #166534; }
-    .badge-internal { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #fef3c7; color: #92400e; }
-    .badge-forbidden { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #fecaca; color: #991b1b; }
-    [data-theme="dark"] .badge-public { background: #1c2b22; color: #86efac; }
-    [data-theme="dark"] .badge-internal { background: #2b2517; color: #fcd34d; }
-    [data-theme="dark"] .badge-forbidden { background: #2b1717; color: #fca5a5; }
-
-    /* Rule cards */
     .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
-    .rule-card {
-      border: 1px solid var(--card-border); border-radius: 10px; padding: 16px;
-      background: var(--bg-glass); backdrop-filter: blur(10px);
-    }
-    .rule-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
-    .rule-card p { font-size: 0.85rem; color: var(--text-secondary); }
-
-    code { background: var(--accent-glow); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+    .rule-card { border: 1px solid var(--card-border); border-radius: 16px; padding: 18px; background: color-mix(in srgb, var(--card-bg) 88%, transparent); }
+    .rule-card h4 { font-size: 1rem; margin-bottom: 8px; }
+    .rule-card p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; }
+    .doc-link { color: var(--accent); text-decoration: none; font-weight: 700; }
+    .doc-link:hover { text-decoration: underline; }
 
     footer { margin-top: 48px; text-align: center; font-size: 0.85rem; color: var(--text-muted); padding-bottom: 32px; }
-
-    @media (max-width: 768px) {
-      .hero-title { font-size: 2rem; }
-      .container { padding: 16px; }
-      .main-nav { padding: 8px 16px; top: 8px; }
-      .nav-links { display: none; }
-    }
   </style>
+  <link rel="stylesheet" href="assets/ssafy-docs.css" />
 </head>
 <body>
   <main class="container">
     <nav class="main-nav">
       <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="dashboard-index.html" class="nav-link">인덱스</a>
-        <a href="infra-dashboard.html" class="nav-link">실시간 대시보드</a>
+        <a href="infra-dashboard.html" class="nav-link">대시보드</a>
         <a href="infra-architecture.html" class="nav-link active">아키텍처</a>
+        <a href="infra-runbook.html" class="nav-link">운영 가이드</a>
+        <a href="infra-conventions.html" class="nav-link">컨벤션</a>
       </div>
       <div class="nav-controls">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg id="iconHamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg id="iconClose" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
     </nav>
 
-    <header>
-      <div class="hero">
-        <h1 class="hero-title">인프라 아키텍처 상세 가이드</h1>
-        <p class="hero-sub">SSAFY 2학기 프로젝트를 위한 표준 인프라 구성도 및 서비스 간 통신 흐름을 설명합니다.</p>
-      </div>
+    <header class="hero reveal-on-scroll">
+      <h1 class="hero-title">인프라 아키텍처 가이드</h1>
+      <p class="hero-sub">이 문서는 시스템 구조와 요청 흐름을 설명합니다. 운영 절차는 runbook, 정책 상세는 conventions에서 확인합니다.</p>
     </header>
 
-    <!-- 1. 네트워크 아키텍처 -->
-    <section class="section">
+    <section class="section reveal-on-scroll">
       <h2 class="section-title">1. Network Architecture</h2>
-      <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해 FE 컨테이너로만 진입합니다. 전체 서비스는 <strong>FE → BE → AI → External LLM</strong> 순으로 선형적인 요청 흐름을 가지며, 모든 서비스는 개별 Docker 컨테이너로 구성됩니다.</p>
+      <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해 FE 컨테이너로만 진입합니다. 전체 서비스는 <strong>FE → BE → AI → External LLM</strong> 순으로 선형적인 요청 흐름을 가지며, Main/Dev 환경은 각각 전용 PostgreSQL과 Redis를 공유합니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryColor': '#e0e7ff', 'primaryBorderColor': '#4f46e5', 'primaryTextColor': '#0f172a'}}}%%
@@ -175,18 +78,18 @@ graph LR
             direction LR
             M_FE["fe-main\n:7102"] ==> M_BE["be-main\n:7101"] ==> M_AI["ai-main\n:7103"]
             M_BE -.-> M_DB[("postgres-main\n:7432")]
-            M_BE -.-> M_RD_BE[("redis-be\n:7379")]
+            M_BE -.-> M_RD[("redis-main\n:7379")]
             M_AI -.-> M_DB
-            M_AI -.-> M_RD_AI[("redis-ai\n:7380")]
+            M_AI -.-> M_RD
         end
 
         subgraph DevPlane["Dev Plane (Docker)"]
             direction LR
             D_FE["fe-dev\n:7202"] ==> D_BE["be-dev\n:7201"] ==> D_AI["ai-dev\n:7203"]
             D_BE -.-> D_DB[("postgres-dev\n:8432")]
-            D_BE -.-> D_RD_BE[("redis-be\n:8379")]
+            D_BE -.-> D_RD[("redis-dev\n:8379")]
             D_AI -.-> D_DB
-            D_AI -.-> D_RD_AI[("redis-ai\n:8380")]
+            D_AI -.-> D_RD
         end
 
         subgraph Infra["Infra"]
@@ -212,10 +115,9 @@ graph LR
       </div>
     </section>
 
-    <!-- 2. CI/CD 파이프라인 -->
-    <section class="section">
+    <section class="section reveal-on-scroll">
       <h2 class="section-title">2. CI/CD Pipeline</h2>
-      <p class="section-desc">Jenkins Multibranch Pipeline이 be/fe/ai 각 영역을 독립적으로 빌드/배포합니다.</p>
+      <p class="section-desc">Jenkins Multibranch Pipeline은 be/fe/ai 영역을 독립적으로 빌드/배포합니다. 구조 관점에서 중요한 것은 브랜치별로 배포 plane이 달라진다는 점입니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryColor': '#e0e7ff', 'primaryBorderColor': '#4f46e5', 'primaryTextColor': '#0f172a'}}}%%
@@ -236,23 +138,22 @@ graph LR
       <div class="rule-grid">
         <div class="rule-card">
           <h4>Dev Deploy</h4>
-          <p><code>*/dev</code> 브랜치 push 시 자동 배포. 빠른 통합 검증용.</p>
+          <p><code>*/dev</code> 브랜치 push 시 자동 배포. 빠른 통합 검증용 plane으로 흘러갑니다.</p>
         </div>
         <div class="rule-card">
           <h4>Main Deploy</h4>
-          <p><code>*/main</code> PR merge 시 자동 배포. 승인된 변경만 반영.</p>
+          <p><code>*/main</code> PR merge 시 자동 배포. 승인된 변경만 main plane에 반영됩니다.</p>
         </div>
         <div class="rule-card">
           <h4>Feature Branch</h4>
-          <p><code>*/feature/*</code> 빌드+테스트만. 운영 영향 차단.</p>
+          <p><code>*/feature/*</code>는 build/test만 수행하고 plane 배포로 이어지지 않습니다.</p>
         </div>
       </div>
     </section>
 
-    <!-- 3. Data 분리 -->
-    <section class="section">
+    <section class="section reveal-on-scroll">
       <h2 class="section-title">3. Data Isolation</h2>
-      <p class="section-desc">Main과 Dev 환경은 완전히 분리된 Docker 환경(네트워크, 컨테이너)을 가집니다. BE는 PostgreSQL(읽기/쓰기) 및 Redis(세션/캐시)에, AI는 PostgreSQL(읽기)에 연결되며, FE는 DB/Redis에 직접 접근하지 않습니다.</p>
+      <p class="section-desc">Main과 Dev는 완전히 분리된 Docker 환경을 가집니다. BE와 AI는 각 환경의 PostgreSQL 및 Redis에 접근하고, FE는 DB/Redis에 직접 접근하지 않습니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryTextColor': '#0f172a'}}}%%
@@ -261,18 +162,18 @@ graph TB
         direction LR
         M_FE["fe-main :7102"] ==> M_BE["be-main :7101"] ==> M_AI["ai-main :7103"]
         M_BE -.-> M_DB[("postgres-main\n:7432")]
-        M_BE -.-> M_RD_BE[("redis-be :7379")]
+        M_BE -.-> M_RD[("redis-main :7379")]
         M_AI -.-> M_DB
-        M_AI -.-> M_RD_AI[("redis-ai :7380")]
+        M_AI -.-> M_RD
     end
 
     subgraph Dev["Dev Plane (Docker)"]
         direction LR
         D_FE["fe-dev :7202"] ==> D_BE["be-dev :7201"] ==> D_AI["ai-dev :7203"]
         D_BE -.-> D_DB[("postgres-dev\n:8432")]
-        D_BE -.-> D_RD_BE[("redis-be :8379")]
+        D_BE -.-> D_RD[("redis-dev :8379")]
         D_AI -.-> D_DB
-        D_AI -.-> D_RD_AI[("redis-ai :8380")]
+        D_AI -.-> D_RD
     end
 
     Main <---->|"Cross-Access 금지\n별도 컨테이너 및 분리 환경"| Dev
@@ -283,87 +184,68 @@ graph TB
       </div>
     </section>
 
-    <!-- 4. 포트 레퍼런스 -->
-    <section class="section">
-      <h2 class="section-title">4. Port Reference</h2>
-      <table class="port-table">
-        <thead>
-          <tr><th>Port</th><th>Service</th><th>Bind</th><th>Level</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>80</code></td><td>Nginx HTTP</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
-          <tr><td><code>443</code></td><td>Nginx HTTPS</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
-          <tr><td><code>22</code></td><td>SSH</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
-          <tr><td><code>8989</code></td><td>Gerrit (optional)</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
-          <tr><td><code>8080</code></td><td>Jenkins</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>7101-7103</code></td><td>Main (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>7201-7203</code></td><td>Dev (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>7432</code></td><td>Main PostgreSQL</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>7379 / 7380</code></td><td>Main Redis (BE / AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>8432</code></td><td>Dev PostgreSQL</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>8379 / 8380</code></td><td>Dev Redis (BE / AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>5432 / 6379 / 3306</code></td><td>DB defaults</td><td>-</td><td><span class="badge-forbidden">Forbidden</span></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- 5. 보안 규칙 -->
-    <section class="section">
-      <h2 class="section-title">5. Security Rules</h2>
-      <div class="rule-grid">
-        <div class="rule-card">
-          <h4>Public Bind 제한</h4>
-          <p><code>5432/6379/3306/27017/8080</code>의 <code>0.0.0.0</code> 바인딩 금지.</p>
+    <section class="section reveal-on-scroll">
+      <h2 class="section-title">4. Component Responsibilities</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Nginx</h3>
+          <p>외부 공개 진입점입니다. 앱과 Jenkins를 직접 공개하지 않고 reverse proxy 역할만 수행합니다.</p>
         </div>
-        <div class="rule-card">
-          <h4>SSH 강화</h4>
-          <p>Password 로그인 비활성화. Root 직접 로그인 차단. Key-only 접근.</p>
+        <div class="card">
+          <h3>Application Plane</h3>
+          <p>FE는 사용자 요청 진입점, BE는 비즈니스 로직, AI는 외부 LLM 연동을 담당합니다.</p>
         </div>
-        <div class="rule-card">
-          <h4>Jenkins 접근 제어</h4>
-          <p>Nginx reverse proxy 경유. <code>JENKINS_ALLOW_CIDR</code>로 IP 제한.</p>
+        <div class="card">
+          <h3>Data Plane</h3>
+          <p>각 환경은 전용 PostgreSQL과 Redis를 갖습니다. 환경 간 cross-access는 허용되지 않습니다.</p>
         </div>
-        <div class="rule-card">
-          <h4>Credential 관리</h4>
-          <p><code>.env</code>, <code>.pem</code> Git 추적 금지. Jenkins credential store 우선.</p>
-        </div>
-        <div class="rule-card">
-          <h4>Tailscale Auth</h4>
-          <p>Auth key 주기적 회전. Host-level VPN으로 운영자 접근 이중화.</p>
-        </div>
-        <div class="rule-card">
-          <h4>Data Isolation</h4>
-          <p>Main/Dev DB, Redis 완전 분리. Cross-environment access ACL 금지.</p>
+        <div class="card">
+          <h3>Infra Plane</h3>
+          <p>Jenkins는 배포 오케스트레이션, Tailscale은 운영 접근 경로를 담당합니다.</p>
         </div>
       </div>
     </section>
 
-    <footer>
-      SSAFY A408 Infrastructure Architecture &copy; 2026
-    </footer>
+    <section class="section reveal-on-scroll">
+      <h2 class="section-title">5. Related Docs</h2>
+      <p class="section-desc">이 문서는 구조 설명만 담당합니다. 실행 절차와 정책 세부는 아래 문서로 이동합니다.</p>
+      <div class="rule-grid">
+        <div class="rule-card">
+          <h4>운영 가이드</h4>
+          <p>SSH/UFW/Docker/Nginx/Jenkins/Tailscale 설치와 점검 절차는 <a class="doc-link" href="infra-runbook.html">infra-runbook.html</a>에서 확인합니다.</p>
+        </div>
+        <div class="rule-card">
+          <h4>컨벤션</h4>
+          <p>포트, 보안, 네이밍, 브랜치 규칙은 <a class="doc-link" href="infra-conventions.html">infra-conventions.html</a>가 단일 출처입니다.</p>
+        </div>
+        <div class="rule-card">
+          <h4>운영 상태</h4>
+          <p>현재 health score, service checks, plan vs actual은 <a class="doc-link" href="infra-dashboard.html">infra-dashboard.html</a>에서 확인합니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="next-step-container reveal-on-scroll">
+      <a href="infra-runbook.html" class="next-page-trigger">
+        <div class="next-step-label">Next Step</div>
+        <h2 class="next-step-title">운영 가이드 확인하기</h2>
+        <p class="next-step-desc">실제 서버 점검, 설치 및 장애 대응을 위한 단계별 실행 절차를 확인하세요.</p>
+        <div class="next-step-icon">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </section>
+
+    <footer>SSAFY A408 Infrastructure Architecture &copy; 2026</footer>
   </main>
 
   <script>
-    // Theme
-    const themeToggle = document.getElementById("themeToggle");
-    const getTheme = () => localStorage.getItem("ssafy-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    const applyTheme = (theme) => {
-      document.documentElement.setAttribute("data-theme", theme);
-      localStorage.setItem("ssafy-theme", theme);
-      document.getElementById("iconSun").style.display = theme === "dark" ? "block" : "none";
-      document.getElementById("iconMoon").style.display = theme === "dark" ? "none" : "block";
-    };
-    applyTheme(getTheme());
-    themeToggle.addEventListener("click", () => applyTheme(getTheme() === "dark" ? "light" : "dark"));
-
-    // Mermaid init (theme-aware)
-    const mermaidTheme = getTheme() === "dark" ? "dark" : "default";
     mermaid.initialize({
       startOnLoad: true,
-      theme: mermaidTheme,
-      flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
-      securityLevel: "loose"
+      securityLevel: "loose",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif"
     });
+    mermaid.run({ querySelector: ".mermaid" });
   </script>
 </body>
 </html>
