@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSAFY Infra Conventions</title>
+  <style>
+    :root {
+      --bg: #f8fafc; --bg-glass: rgba(248,250,252,0.75);
+      --card-bg: rgba(255,255,255,0.8); --card-border: rgba(0,0,0,0.08);
+      --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #64748b;
+      --accent: #4f46e5; --accent-light: #6366f1; --accent-glow: rgba(79,70,229,0.2);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px; --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+      --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --gradient-bg: radial-gradient(circle at 100% 0%, #f0f9ff 0%, #f8fafc 50%, #faf5ff 100%);
+      --main-c: #2563eb; --dev-c: #ea580c; --ok-c: #16a34a; --warn-c: #d97706; --danger-c: #dc2626;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0f; --bg-glass: rgba(10,10,15,0.6);
+      --card-bg: rgba(24,24,33,0.7); --card-border: rgba(255,255,255,0.1);
+      --text-primary: #f8fafc; --text-secondary: #a1a1aa; --text-muted: #71717a;
+      --accent: #818cf8; --accent-light: #a78bfa; --accent-glow: rgba(99,102,241,0.3);
+      --gradient-bg: radial-gradient(circle at 0% 100%, #0a0a0f 0%, #171c2c 50%, #0a0a0f 100%);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background-color: var(--bg); background-image: var(--gradient-bg);
+      color: var(--text-primary); line-height: 1.6; min-height: 100vh;
+      -webkit-font-smoothing: antialiased; transition: background var(--transition), color var(--transition);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .main-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px; margin-bottom: 32px;
+      background: var(--bg-glass); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      position: sticky; top: 16px; z-index: 100;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
+    .nav-logo-accent { color: var(--accent); }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
+    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
+    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
+    .hero-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; line-height: 1.2; text-align: center; }
+    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; text-align: center; }
+
+    /* TOC */
+    .toc { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px 28px; margin-bottom: 24px; backdrop-filter: blur(20px); }
+    .toc-title { font-weight: 700; margin-bottom: 10px; font-size: 1rem; }
+    .toc-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 20px; }
+    .toc-list a { text-decoration: none; color: var(--accent); font-size: 0.9rem; font-weight: 500; }
+    .toc-list a:hover { text-decoration: underline; }
+
+    .section { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
+    .section-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--accent-glow); }
+    .section-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px; }
+    .subsection { margin-top: 20px; }
+    .subsection h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--card-border); padding: 10px 14px; text-align: left; }
+    th { background: var(--accent-glow); font-weight: 600; }
+    tr:hover { background: var(--accent-glow); }
+
+    code { background: var(--accent-glow); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: "JetBrains Mono", "Fira Code", monospace; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-main { background: #dbeafe; color: #1e40af; }
+    .badge-dev { background: #ffedd5; color: #9a3412; }
+    .badge-ok { background: #dcfce7; color: #166534; }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fecaca; color: #991b1b; }
+    [data-theme="dark"] .badge-main { background: #1e3a5f; color: #93c5fd; }
+    [data-theme="dark"] .badge-dev { background: #431407; color: #fdba74; }
+    [data-theme="dark"] .badge-ok { background: #1c2b22; color: #86efac; }
+    [data-theme="dark"] .badge-warn { background: #2b2517; color: #fcd34d; }
+    [data-theme="dark"] .badge-danger { background: #2b1717; color: #fca5a5; }
+
+    .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 12px; }
+    .rule-card { border: 1px solid var(--card-border); border-radius: 10px; padding: 16px; background: var(--bg-glass); }
+    .rule-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+    .rule-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+    .rule-card ul { font-size: 0.85rem; color: var(--text-secondary); padding-left: 18px; }
+
+    footer { margin-top: 48px; text-align: center; font-size: 0.85rem; color: var(--text-muted); padding-bottom: 32px; }
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2rem; }
+      .container { padding: 16px; }
+      .main-nav { padding: 8px 16px; top: 8px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <nav class="main-nav">
+      <a href="./index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links">
+        <a href="./index.html" class="nav-link">Home</a>
+        <a href="./infra-architecture.html" class="nav-link">Architecture</a>
+        <a href="./infra-conventions.html" class="nav-link active">Conventions</a>
+        <a href="./infra-dashboard.html" class="nav-link">Status</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </nav>
+
+    <header>
+      <h1 class="hero-title">Infrastructure Conventions</h1>
+      <p class="hero-sub">SSAFY A408 팀 인프라 컨벤션 | 모든 팀원이 따라야 하는 규칙</p>
+    </header>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <ol class="toc-list">
+        <li><a href="#naming">Naming Convention</a></li>
+        <li><a href="#ports">Port Convention</a></li>
+        <li><a href="#docker">Docker Strategy</a></li>
+        <li><a href="#branching">Branch & Versioning</a></li>
+        <li><a href="#cicd">CI/CD Convention</a></li>
+        <li><a href="#env">Environment & Secrets</a></li>
+        <li><a href="#security">Network & Security</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. Naming Convention -->
+    <section class="section" id="naming">
+      <h2 class="section-title">1. Naming Convention</h2>
+      <p class="section-desc">모든 리소스 이름은 이 규칙을 따릅니다. 일관된 네이밍은 자동화와 디버깅의 기반입니다.</p>
+      <table>
+        <thead><tr><th>리소스</th><th>패턴</th><th>예시</th></tr></thead>
+        <tbody>
+          <tr><td>EC2 호스트</td><td><code>j14a408</code></td><td><code>j14a408.p.ssafy.io</code></td></tr>
+          <tr><td>SSH alias</td><td><code>ssafy-ec2</code></td><td><code>ssh ssafy-ec2</code></td></tr>
+          <tr><td>Docker 컨테이너</td><td><code>{service}-{env}</code></td><td><code>be-main</code>, <code>fe-dev</code>, <code>ai-main</code></td></tr>
+          <tr><td>Docker 이미지</td><td><code>ssafy-{service}</code></td><td><code>ssafy-be:main-latest</code></td></tr>
+          <tr><td>DB 인스턴스</td><td><code>postgres-{env}</code></td><td><code>postgres-main</code>, <code>postgres-dev</code></td></tr>
+          <tr><td>Redis 인스턴스</td><td><code>redis-{env}</code></td><td><code>redis-main</code>, <code>redis-dev</code></td></tr>
+          <tr><td>Git 브랜치</td><td><code>{domain}/{channel}</code></td><td><code>be/main</code>, <code>fe/dev</code>, <code>ai/feature/login</code></td></tr>
+          <tr><td>Jenkins Job</td><td><code>ssafy-{domain}</code></td><td><code>ssafy-be</code>, <code>ssafy-fe</code>, <code>ssafy-ai</code></td></tr>
+          <tr><td>Mattermost 채널</td><td><code>{domain}-deploy</code></td><td><code>be-deploy</code>, <code>fe-deploy</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 2. Port Convention -->
+    <section class="section" id="ports">
+      <h2 class="section-title">2. Port Convention</h2>
+      <p class="section-desc">포트 체계: Main은 <code>71xx</code> / <code>74xx</code>, Dev는 <code>72xx</code> / <code>84xx</code>. 외부 노출은 Nginx만.</p>
+
+      <div class="subsection">
+        <h3>Public (외부 허용)</h3>
+        <table>
+          <thead><tr><th>Port</th><th>Service</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td><code>80</code></td><td>Nginx HTTP</td><td>항상 열림</td></tr>
+            <tr><td><code>443</code></td><td>Nginx HTTPS</td><td>항상 열림</td></tr>
+            <tr><td><code>22</code></td><td>SSH</td><td>Key-only 접근</td></tr>
+            <tr><td><code>8989</code></td><td>Gerrit</td><td>정책 허용 시만</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Internal (127.0.0.1 only)</h3>
+        <table>
+          <thead><tr><th>Port</th><th>Main</th><th>Dev</th><th>Service</th></tr></thead>
+          <tbody>
+            <tr><td>App - BE</td><td><code>:7101</code></td><td><code>:7201</code></td><td>Backend API</td></tr>
+            <tr><td>App - FE</td><td><code>:7102</code></td><td><code>:7202</code></td><td>Frontend</td></tr>
+            <tr><td>App - AI</td><td><code>:7103</code></td><td><code>:7203</code></td><td>AI Service</td></tr>
+            <tr><td>PostgreSQL</td><td><code>:7432</code></td><td><code>:8432</code></td><td>Database</td></tr>
+            <tr><td>Redis</td><td><code>:7379</code></td><td><code>:8379</code></td><td>Cache/Session</td></tr>
+            <tr><td>Jenkins</td><td colspan="2"><code>:8080</code></td><td>CI/CD (공유)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Forbidden (절대 금지)</h3>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">FORBIDDEN</span> 0.0.0.0 바인딩</h4>
+            <p><code>5432</code>, <code>6379</code>, <code>3306</code>, <code>27017</code>, <code>8080</code> 포트의 외부 바인딩 금지.</p>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">FORBIDDEN</span> 내부 포트 직접 노출</h4>
+            <p><code>7101~7203</code>, <code>7432</code>, <code>8432</code> 등 내부 포트를 방화벽에서 열지 않음.</p>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">FORBIDDEN</span> Cross-env 접근</h4>
+            <p>Main 앱이 Dev DB에 접근하거나 그 반대 금지. 별도 인스턴스, 별도 계정.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Docker Strategy -->
+    <section class="section" id="docker">
+      <h2 class="section-title">3. Docker Strategy</h2>
+      <p class="section-desc">모든 서비스(FE/BE/AI/DB/Redis)는 Docker 컨테이너로 실행합니다. Main과 Dev는 완전 분리.</p>
+
+      <div class="subsection">
+        <h3>컨테이너 구성</h3>
+        <table>
+          <thead><tr><th>구분</th><th>Main Plane</th><th>Dev Plane</th></tr></thead>
+          <tbody>
+            <tr><td>FE</td><td><code>fe-main</code> (:7102)</td><td><code>fe-dev</code> (:7202)</td></tr>
+            <tr><td>BE</td><td><code>be-main</code> (:7101)</td><td><code>be-dev</code> (:7201)</td></tr>
+            <tr><td>AI</td><td><code>ai-main</code> (:7103)</td><td><code>ai-dev</code> (:7203)</td></tr>
+            <tr><td>DB</td><td><code>postgres-main</code> (:7432)</td><td><code>postgres-dev</code> (:8432)</td></tr>
+            <tr><td>Redis</td><td><code>redis-main</code> (:7379)</td><td><code>redis-dev</code> (:8379)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>이미지 태그 정책</h3>
+        <table>
+          <thead><tr><th>태그</th><th>용도</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><code>sha-{short}</code></td><td>Immutable 식별자 (CI에서 자동 생성)</td><td><code>ssafy-be:sha-a1b2c3d</code></td></tr>
+            <tr><td><code>main-latest</code></td><td>Main 채널 최신 안정 빌드</td><td><code>ssafy-be:main-latest</code></td></tr>
+            <tr><td><code>dev-latest</code></td><td>Dev 채널 최신 빌드</td><td><code>ssafy-be:dev-latest</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Docker Compose 원칙</h3>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <h4>환경 분리</h4>
+            <p>Main과 Dev는 별도 compose 파일 또는 profile로 격리. 네트워크도 분리.</p>
+          </div>
+          <div class="rule-card">
+            <h4>Restart 정책</h4>
+            <p>Main: <code>unless-stopped</code>. Dev: <code>on-failure</code> (실험 환경이라 무한 재시작 방지).</p>
+          </div>
+          <div class="rule-card">
+            <h4>Volume 관리</h4>
+            <p>DB/Redis 데이터는 named volume 사용. 환경별 volume 이름 분리 필수.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Branch & Versioning -->
+    <section class="section" id="branching">
+      <h2 class="section-title">4. Branch & Versioning</h2>
+      <p class="section-desc">모노레포에서 도메인별 브랜치를 사용합니다. 버전 태그는 SemVer를 따릅니다.</p>
+
+      <div class="subsection">
+        <h3>브랜치 전략</h3>
+        <table>
+          <thead><tr><th>패턴</th><th>역할</th><th>배포</th></tr></thead>
+          <tbody>
+            <tr><td><code>{domain}/main</code></td><td>안정 릴리스 채널</td><td><span class="badge badge-main">PR merge → auto deploy</span></td></tr>
+            <tr><td><code>{domain}/dev</code></td><td>통합 검증 채널</td><td><span class="badge badge-dev">push → auto deploy</span></td></tr>
+            <tr><td><code>{domain}/feature/*</code></td><td>개발 검증</td><td><span class="badge badge-warn">test only, no deploy</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:0.9rem; color:var(--text-secondary);">
+          <code>{domain}</code> = <code>be</code>, <code>fe</code>, <code>ai</code>.
+          예: <code>be/main</code>, <code>fe/dev</code>, <code>ai/feature/embedding</code>
+        </p>
+      </div>
+
+      <div class="subsection">
+        <h3>버전 태그</h3>
+        <table>
+          <thead><tr><th>채널</th><th>형식</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td>Release</td><td><code>vX.Y.Z</code></td><td><code>v1.2.0</code></td></tr>
+            <tr><td>Dev</td><td><code>vX.Y.Z-dev.N</code></td><td><code>v1.3.0-dev.4</code></td></tr>
+            <tr><td>RC</td><td><code>vX.Y.Z-rc.N</code></td><td><code>v1.3.0-rc.1</code></td></tr>
+            <tr><td>서비스별 태그</td><td><code>{domain}-vX.Y.Z</code></td><td><code>be-v1.4.2</code>, <code>fe-v2.0.1</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>브랜치 규칙</h3>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">FORBIDDEN</span></h4>
+            <ul>
+              <li><code>main</code> direct push 금지</li>
+              <li>PR 없이 <code>main</code> merge 금지</li>
+              <li><code>feature/*</code> 브랜치에서 배포 금지</li>
+            </ul>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-ok">REQUIRED</span></h4>
+            <ul>
+              <li>PR merge 전 CI 통과 필수</li>
+              <li>main 배포 시 버전 태그 필수</li>
+              <li>통합 릴리스 시 릴리스 노트 작성</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CI/CD Convention -->
+    <section class="section" id="cicd">
+      <h2 class="section-title">5. CI/CD Convention</h2>
+      <p class="section-desc">Jenkins Multibranch Pipeline 기반. 도메인별 독립 파이프라인으로 운영합니다.</p>
+
+      <div class="subsection">
+        <h3>파이프라인 구조</h3>
+        <table>
+          <thead><tr><th>파이프라인</th><th>소스</th><th>Jenkinsfile 위치</th></tr></thead>
+          <tbody>
+            <tr><td><code>ssafy-be</code></td><td>GitLab <code>be/*</code></td><td><code>be/Jenkinsfile</code></td></tr>
+            <tr><td><code>ssafy-fe</code></td><td>GitLab <code>fe/*</code></td><td><code>fe/Jenkinsfile</code></td></tr>
+            <tr><td><code>ssafy-ai</code></td><td>GitLab <code>ai/*</code></td><td><code>ai/Jenkinsfile</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>배포 트리거</h3>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <h4><span class="badge badge-dev">Dev Deploy</span></h4>
+            <p><code>*/dev</code> 브랜치 push 시 자동 배포. Docker 이미지 빌드 → <code>dev-latest</code> 태그 → 컨테이너 교체.</p>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-main">Main Deploy</span></h4>
+            <p><code>*/main</code> PR merge 시 자동 배포. Docker 이미지 빌드 → <code>sha-*</code> + <code>main-latest</code> 태그 → 컨테이너 교체.</p>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-warn">Feature Test</span></h4>
+            <p><code>*/feature/*</code> push/PR 시 빌드 + 테스트만 실행. 배포 stage는 skip.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>알림</h3>
+        <p style="font-size:0.9rem; color:var(--text-secondary);">배포 성공/실패 시 Mattermost의 해당 도메인 채널(<code>be-deploy</code>, <code>fe-deploy</code>, <code>ai-deploy</code>)로 알림 전송.</p>
+      </div>
+    </section>
+
+    <!-- 6. Environment & Secrets -->
+    <section class="section" id="env">
+      <h2 class="section-title">6. Environment & Secrets</h2>
+      <p class="section-desc">시크릿은 <code>.env</code> 파일로 관리하고, Git에는 절대 커밋하지 않습니다.</p>
+
+      <div class="subsection">
+        <h3>.env 구조</h3>
+        <table>
+          <thead><tr><th>파일</th><th>역할</th><th>Git 추적</th></tr></thead>
+          <tbody>
+            <tr><td><code>.env.example</code></td><td>변수 키 목록 (값 없음)</td><td><span class="badge badge-ok">O</span></td></tr>
+            <tr><td><code>.env</code></td><td>실제 시크릿 값</td><td><span class="badge badge-danger">X</span></td></tr>
+            <tr><td><code>.env.tailscale</code></td><td>Tailscale 전용 설정</td><td><span class="badge badge-danger">X</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>환경 변수 네이밍</h3>
+        <table>
+          <thead><tr><th>패턴</th><th>예시</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><code>{SERVICE}_{ENV}_*</code></td><td><code>DB_MAIN_HOST</code></td><td>Main DB 호스트</td></tr>
+            <tr><td><code>{SERVICE}_{ENV}_*</code></td><td><code>DB_DEV_PASSWORD</code></td><td>Dev DB 비밀번호</td></tr>
+            <tr><td><code>REDIS_{ENV}_*</code></td><td><code>REDIS_MAIN_URL</code></td><td>Main Redis 접속 URL</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Main/Dev 접속정보는 반드시 <code>_MAIN</code>, <code>_DEV</code> suffix로 분리합니다.</p>
+      </div>
+
+      <div class="subsection">
+        <h3>금지 사항</h3>
+        <div class="rule-grid">
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">NEVER</span> Git에 시크릿 커밋</h4>
+            <p><code>.env</code>, <code>.pem</code>, <code>*.keys.json</code>, <code>credentials.json</code> 등은 <code>.gitignore</code>에 등록.</p>
+          </div>
+          <div class="rule-card">
+            <h4><span class="badge badge-danger">NEVER</span> 로그에 시크릿 출력</h4>
+            <p>API 키, DB 비밀번호, 토큰 등을 로그로 찍지 않음. 요청 메타데이터만 기록.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Network & Security -->
+    <section class="section" id="security">
+      <h2 class="section-title">7. Network & Security</h2>
+      <p class="section-desc">최소 권한 원칙. 외부 접근은 Nginx만, 운영 접근은 SSH + Tailscale 이중화.</p>
+
+      <div class="rule-grid">
+        <div class="rule-card">
+          <h4>SSH 강화</h4>
+          <ul>
+            <li>Password 로그인 비활성화</li>
+            <li>Root 직접 로그인 차단</li>
+            <li>Key-only 인증</li>
+          </ul>
+        </div>
+        <div class="rule-card">
+          <h4>방화벽 (UFW)</h4>
+          <ul>
+            <li>기본 정책: deny incoming</li>
+            <li>허용: 22, 80, 443</li>
+            <li>선택: 8989 (Gerrit)</li>
+          </ul>
+        </div>
+        <div class="rule-card">
+          <h4>Nginx Reverse Proxy</h4>
+          <ul>
+            <li>모든 외부 트래픽은 Nginx 경유</li>
+            <li>Jenkins는 <code>/jenkins/</code> + CIDR 제한</li>
+            <li>보안 헤더 필수 적용</li>
+          </ul>
+        </div>
+        <div class="rule-card">
+          <h4>Tailscale VPN</h4>
+          <ul>
+            <li>Host-level 설치 (1단계)</li>
+            <li>운영자 사설 접근 이중화</li>
+            <li>Auth key 주기적 회전</li>
+          </ul>
+        </div>
+        <div class="rule-card">
+          <h4>Jenkins 접근 제어</h4>
+          <ul>
+            <li>127.0.0.1:8080 loopback only</li>
+            <li>Nginx 경유 + CIDR 제한</li>
+            <li>Credential store 우선 사용</li>
+          </ul>
+        </div>
+        <div class="rule-card">
+          <h4>Data Isolation</h4>
+          <ul>
+            <li>Main/Dev DB 완전 분리</li>
+            <li>Main/Dev Redis 완전 분리</li>
+            <li>Cross-env 접근 ACL 금지</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      SSAFY A408 Infrastructure Conventions &copy; 2026
+    </footer>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById("themeToggle");
+    const getTheme = () => localStorage.getItem("ssafy-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const applyTheme = (theme) => {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("ssafy-theme", theme);
+      document.getElementById("iconSun").style.display = theme === "dark" ? "block" : "none";
+      document.getElementById("iconMoon").style.display = theme === "dark" ? "none" : "block";
+    };
+    applyTheme(getTheme());
+    themeToggle.addEventListener("click", () => applyTheme(getTheme() === "dark" ? "light" : "dark"));
+  </script>
+</body>
+</html>
