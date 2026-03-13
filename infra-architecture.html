@@ -160,51 +160,48 @@
       <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해서만 진입하고, 내부 서비스는 loopback에서만 동작합니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
-graph TD
-    Internet(("Internet"))
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryColor': '#e0e7ff', 'primaryBorderColor': '#4f46e5', 'primaryTextColor': '#0f172a'}}}%%
+graph LR
+    User(("User")) ==>|"80/443"| Nginx
 
-    subgraph EC2["EC2 : j14a408.p.ssafy.io (4vCPU / 15GB RAM)"]
-        direction TB
-        Nginx["Nginx\nReverse Proxy\n80 / 443"]
-        Jenkins["Jenkins CI/CD\n127.0.0.1:8080"]
-        Tailscale["Tailscale VPN\n(Ops Access)"]
+    subgraph EC2["EC2 : j14a408.p.ssafy.io — 4 vCPU / 15 GB"]
+        Nginx["Nginx\nReverse Proxy"]
 
-        subgraph MainPlane["Main Plane"]
+        subgraph MainPlane["Main Plane (Docker)"]
             direction LR
-            BE_M["be-main\n:7101"]
-            FE_M["fe-main\n:7102"]
-            AI_M["ai-main\n:7103"]
-            PG_M[("PostgreSQL\n:7432")]
-            RD_M[("Redis\n:7379")]
+            M_FE["FE\n:7102"] ==> M_BE["BE\n:7101"] ==> M_AI["AI\n:7103"]
+            M_BE -.-> M_DB[("DB :7432")]
+            M_BE -.-> M_RD[("Redis :7379")]
+            M_AI -.-> M_DB
         end
 
-        subgraph DevPlane["Dev Plane"]
+        subgraph DevPlane["Dev Plane (Docker)"]
             direction LR
-            BE_D["be-dev\n:7201"]
-            FE_D["fe-dev\n:7202"]
-            AI_D["ai-dev\n:7203"]
-            PG_D[("PostgreSQL\n:8432")]
-            RD_D[("Redis\n:8379")]
+            D_FE["FE\n:7202"] ==> D_BE["BE\n:7201"] ==> D_AI["AI\n:7203"]
+            D_BE -.-> D_DB[("DB :8432")]
+            D_BE -.-> D_RD[("Redis :8379")]
+            D_AI -.-> D_DB
+        end
+
+        subgraph Infra["Infra"]
+            direction LR
+            Jenkins["Jenkins :8080"]
+            Tailscale["Tailscale VPN"]
         end
     end
 
-    Internet -->|"80 / 443"| Nginx
-    Internet -->|"22 (SSH)"| EC2
+    M_AI ==>|"API"| LLM(("External\nLLM"))
+    D_AI ==>|"API"| LLM
 
-    Nginx -->|"path routing"| BE_M & FE_M & AI_M
-    Nginx -->|"path routing"| BE_D & FE_D & AI_D
+    Nginx ==>|"main"| M_FE
+    Nginx ==>|"dev"| D_FE
 
-    BE_M --> PG_M & RD_M
-    AI_M --> PG_M
-    BE_D --> PG_D & RD_D
-    AI_D --> PG_D
-
-    Jenkins -->|"deploy"| MainPlane
-    Jenkins -->|"deploy"| DevPlane
-
-    style MainPlane fill:#dbeafe,stroke:#2563eb,stroke-width:2px
-    style DevPlane fill:#ffedd5,stroke:#f97316,stroke-width:2px
-    style Internet fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style MainPlane fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    style DevPlane fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#431407
+    style Infra fill:#f0fdf4,stroke:#16a34a,stroke-width:1px
+    style User fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style LLM fill:#fae8ff,stroke:#a855f7,stroke-width:2px,color:#581c87
+    style Nginx fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#312e81
         </pre>
       </div>
     </section>
@@ -215,32 +212,19 @@ graph TD
       <p class="section-desc">Jenkins Multibranch Pipeline이 be/fe/ai 각 영역을 독립적으로 빌드/배포합니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryColor': '#e0e7ff', 'primaryBorderColor': '#4f46e5', 'primaryTextColor': '#0f172a'}}}%%
 graph LR
-    subgraph Trigger["GitLab Events"]
-        Push["Push to\n*/dev"]
-        PR["PR Merge to\n*/main"]
-        Feat["Push to\n*/feature/*"]
-    end
+    GitLab["GitLab\nWebhook"] ==> Jenkins["Jenkins\nMultibranch\n(be / fe / ai)"]
 
-    subgraph Jenkins["Jenkins Multibranch"]
-        J_BE["be pipeline"]
-        J_FE["fe pipeline"]
-        J_AI["ai pipeline"]
-    end
+    Jenkins ==>|"*/dev push"| DevDeploy["Auto Deploy\nDev Plane"]
+    Jenkins ==>|"*/main PR merge"| MainDeploy["Auto Deploy\nMain Plane"]
+    Jenkins -.->|"*/feature/*"| TestOnly["Test Only\nNo Deploy"]
 
-    subgraph Actions["Deployment"]
-        DevDeploy["Auto Deploy\nto Dev Plane"]
-        MainDeploy["Auto Deploy\nto Main Plane"]
-        TestOnly["Test Only\nNo Deploy"]
-    end
-
-    Push --> J_BE & J_FE & J_AI --> DevDeploy
-    PR --> J_BE & J_FE & J_AI --> MainDeploy
-    Feat --> J_BE & J_FE & J_AI --> TestOnly
-
-    style DevDeploy fill:#ffedd5,stroke:#f97316,stroke-width:2px
-    style MainDeploy fill:#dbeafe,stroke:#2563eb,stroke-width:2px
-    style TestOnly fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px
+    style GitLab fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    style Jenkins fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#312e81
+    style DevDeploy fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#431407
+    style MainDeploy fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    style TestOnly fill:#f1f5f9,stroke:#94a3b8,stroke-width:1px,color:#475569
         </pre>
       </div>
       <div class="rule-grid">
@@ -265,25 +249,28 @@ graph LR
       <p class="section-desc">Main과 Dev 환경의 DB/Redis는 완전 분리합니다. cross-access 금지.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryTextColor': '#0f172a'}}}%%
 graph TB
-    subgraph Main["Main Environment"]
+    subgraph Main["Main Docker Containers"]
         direction LR
-        M_BE["be-main"] --> M_DB[("PostgreSQL\n:7432")]
-        M_BE --> M_RD[("Redis\n:7379")]
-        M_AI["ai-main"] --> M_DB
+        M_FE["FE :7102"] ==> M_BE["BE :7101"] ==> M_AI["AI :7103"]
+        M_BE -.-> M_DB[("PostgreSQL\n:7432")]
+        M_BE -.-> M_RD[("Redis\n:7379")]
+        M_AI -.-> M_DB
     end
 
-    subgraph Dev["Dev Environment"]
+    subgraph Dev["Dev Docker Containers"]
         direction LR
-        D_BE["be-dev"] --> D_DB[("PostgreSQL\n:8432")]
-        D_BE --> D_RD[("Redis\n:8379")]
-        D_AI["ai-dev"] --> D_DB
+        D_FE["FE :7202"] ==> D_BE["BE :7201"] ==> D_AI["AI :7203"]
+        D_BE -.-> D_DB[("PostgreSQL\n:8432")]
+        D_BE -.-> D_RD[("Redis\n:8379")]
+        D_AI -.-> D_DB
     end
 
-    Main -.-|"Cross-Access 금지"| Dev
+    Main <---->|"Cross-Access 금지\n별도 인스턴스 / 계정 / 백업"| Dev
 
-    style Main fill:#dbeafe,stroke:#2563eb,stroke-width:2px
-    style Dev fill:#ffedd5,stroke:#f97316,stroke-width:2px
+    style Main fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    style Dev fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#431407
         </pre>
       </div>
     </section>
