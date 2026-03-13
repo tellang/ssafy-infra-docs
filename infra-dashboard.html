@@ -301,7 +301,7 @@
           <div class="kpi-card">
             <div class="kpi-label"><svg><use href="#icon-cloud-off"></use></svg>App Upstream</div>
             <div class="kpi-value">응답 없음 <span class="status-badge warn"><span class="dot"></span>WARN</span></div>
-            <div class="kpi-footer">127.0.0.1:3000 앱 미배포 상태</div>
+            <div class="kpi-footer">FE(:7102/:7202) 앱 미배포 상태</div>
           </div>
            <div class="kpi-card">
             <div class="kpi-label"><svg><use href="#icon-server"></use></svg>Jenkins</div>
@@ -334,7 +334,7 @@
         <p class="section-desc">전체 인프라가 어떻게 구성되고 트래픽이 어떻게 흐르는지 보여주는 다이어그램입니다.</p>
         <div class="diagram-wrapper">
           <svg id="infra_diagram" viewBox="0 0 1160 800" xmlns="http://www.w3.org/2000/svg">
-            <title>SSAFY 4-Redis 분리 인프라 아키텍처</title>
+            <title>SSAFY 선형 인프라 아키텍처 (FE → BE → AI → LLM)</title>
             <defs>
               <marker id="arrowSolid" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                 <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
@@ -377,23 +377,21 @@
             <path d="M640,115 H560" class="line-solid" />
             <text x="572" y="108" class="line-label">22 / 80 / 443</text>
 
-            <!-- Nginx → Apps: trunk + bus + drops -->
+            <!-- Nginx → FE (선형 진입점) -->
             <path d="M450,150 V178" class="line-solid" />
-            <!-- main bus -->
-            <line x1="345" y1="183" x2="745" y2="183" class="line-solid" style="stroke-width:2px;opacity:0.5;" />
-            <path d="M345,183 V250" class="line-solid" marker-end="url(#arrowSolid)" />
-            <path d="M545,183 V250" class="line-solid" marker-end="url(#arrowSolid)" />
-            <path d="M745,183 V250" class="line-solid" marker-end="url(#arrowSolid)" />
+            <!-- main: Nginx → FE-main -->
+            <path d="M400,178 V250" class="line-solid" marker-end="url(#arrowSolid)" />
             <text x="290" y="180" class="line-label" style="font-size:10px;">main</text>
-            <text x="332" y="247" class="line-label" style="font-size:11px;">/</text>
-            <text x="522" y="247" class="line-label" style="font-size:11px;">/api</text>
-            <text x="730" y="247" class="line-label" style="font-size:11px;">/ai</text>
-            <!-- dev bus -->
-            <line x1="345" y1="193" x2="745" y2="193" class="line-solid" style="stroke-width:2px;opacity:0.5;" />
-            <path d="M345,193 V355" class="line-solid" marker-end="url(#arrowSolid)" />
-            <path d="M545,193 V355" class="line-solid" marker-end="url(#arrowSolid)" />
-            <path d="M745,193 V355" class="line-solid" marker-end="url(#arrowSolid)" />
+            <!-- main: FE → BE → AI (선형) -->
+            <path d="M425,280 H465" class="line-solid" marker-end="url(#arrowSolid)" />
+            <path d="M625,280 H665" class="line-solid" marker-end="url(#arrowSolid)" />
+
+            <!-- dev: Nginx → FE-dev -->
+            <path d="M400,178 V193 L345,193 V355" class="line-solid" marker-end="url(#arrowSolid)" />
             <text x="290" y="191" class="line-label" style="font-size:10px;">dev</text>
+            <!-- dev: FE → BE → AI (선형) -->
+            <path d="M425,385 H465" class="line-solid" marker-end="url(#arrowSolid)" />
+            <path d="M625,385 H665" class="line-solid" marker-end="url(#arrowSolid)" />
 
             <!-- App → Data: Manhattan routing -->
             <!-- BE-main → PG-main -->
@@ -663,10 +661,10 @@ PermitRootLogin no
 
 <span class="code-comment"># 2. 리버스 프록시를 설정합니다 ( /etc/nginx/sites-available/default )</span>
 location / {
-    proxy_pass http://127.0.0.1:3000;
+    proxy_pass http://127.0.0.1:7102;  <span class="code-comment"># FE-main (선형 진입점)</span>
 }
-location /api/ {
-    proxy_pass http://127.0.0.1:8081/;
+location /dev/ {
+    proxy_pass http://127.0.0.1:7202;  <span class="code-comment"># FE-dev</span>
 }
 
 <span class="code-comment"># 3. 설정을 적용합니다.</span>
