@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSAFY Infra Proposal (Pre-install Simulation)</title>
+  <style>
+    /* === Design System & Base Styles (Proposal Theme) === */
+    :root {
+      --bg: #f8fafc;
+      --bg-glass: rgba(248, 250, 252, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #a855f7; /* Purple for proposal */
+      --accent-light: #c084fc;
+      --accent-glow: rgba(168, 85, 247, 0.2);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --gradient-hero: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+      --gradient-bg: radial-gradient(circle at 100% 0%, #f3e8ff 0%, #f8fafc 50%, #faf5ff 100%);
+      
+      --status-planned-text: #475569; --status-planned-bg: rgba(226, 232, 240, 0.7);
+      --status-installing-text: #b45309; --status-installing-bg: rgba(253, 230, 138, 0.7);
+      --status-done-text: #15803d; --status-done-bg: rgba(134, 239, 172, 0.7);
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-glass: rgba(10, 10, 15, 0.6);
+      --card-bg: rgba(24, 24, 33, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f8fafc;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #c084fc;
+      --accent-light: #d8b4fe;
+      --accent-glow: rgba(168, 85, 247, 0.3);
+      --gradient-bg: radial-gradient(circle at 0% 100%, #0a0a0f 0%, #20162b 50%, #0a0a0f 100%);
+
+      --status-planned-text: #94a3b8; --status-planned-bg: rgba(51, 65, 85, 0.7);
+      --status-installing-text: #fcd34d; --status-installing-bg: rgba(71, 51, 22, 0.7);
+      --status-done-text: #86efac; --status-done-bg: rgba(21, 67, 43, 0.7);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; background-color: var(--bg); background-image: var(--gradient-bg); color: var(--text-primary); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background var(--transition), color var(--transition); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    /* === Navigation === */
+    .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; margin-bottom: 32px; background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--card-border); border-radius: var(--radius); position: sticky; top: 16px; z-index: 100; }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
+    .nav-logo-accent { color: var(--accent); }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .nav-controls { display: flex; align-items: center; gap: 16px; }
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); }
+    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
+    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
+    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
+    #iconMoon { display: block; } #iconSun { display: none; }
+    [data-theme="dark"] #iconMoon { display: none; } [data-theme="dark"] #iconSun { display: block; }
+
+    /* === Header & Hero === */
+    .hero-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; line-height: 1.2; }
+    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 16px; max-width: 700px; }
+    .chips-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .chip { display: inline-block; background: var(--bg-glass); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--card-border); border-radius: 99px; padding: 4px 12px; font-size: 0.8rem; color: var(--text-secondary); }
+    .chip a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+    /* === Toolbar & Progress === */
+    .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: var(--card-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--card-border); border-radius: var(--radius); }
+    .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background-color: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 0 16px var(--accent-glow); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.6; }
+    .btn-secondary { background-color: transparent; color: var(--text-secondary); border-color: var(--card-border); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
+    #simState { font-size: 0.9rem; color: var(--text-secondary); }
+    .progress-bar-container { background: var(--card-bg); border-radius: var(--radius); padding: 4px; margin-bottom: 24px; border: 1px solid var(--card-border); backdrop-filter: blur(10px); position: relative; }
+    #progressText { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--text-primary); font-size: 0.8rem; font-weight: 600; text-shadow: 0 0 4px var(--bg); }
+    .progress-bar { width: 100%; height: 20px; background: color-mix(in srgb, var(--accent) 5%, transparent); border-radius: 8px; overflow: hidden; }
+    #progressBarFill { width: 0%; height: 100%; background: var(--gradient-hero); transition: width 0.4s ease-in-out; }
+
+    /* === Cards & Comparison Grid === */
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+    .comparison-grid h3 { text-align: center; margin-bottom: 16px; font-size: 1.25rem; color: var(--text-secondary); }
+    .card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px; transition: all var(--transition); }
+    .card h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .card h4 svg { width: 18px; height: 18px; stroke: var(--accent); }
+    .card-details { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+    .status-badge { margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-radius: 99px; transition: all var(--transition); letter-spacing: 0.05em; }
+    .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-badge.planned { color: var(--status-planned-text); background: var(--status-planned-bg); } .status-badge.planned .dot { background: var(--status-planned-text); }
+    .status-badge.installing { color: var(--status-installing-text); background: var(--status-installing-bg); } .status-badge.installing .dot { background: var(--status-installing-text); animation: pulse 1.5s infinite; }
+    .status-badge.done { color: var(--status-done-text); background: var(--status-done-bg); } .status-badge.done .dot { background: var(--status-done-text); }
+
+    /* === Log Terminal === */
+    .terminal { margin-top: 24px; background: #020617; border-radius: var(--radius); border: 1px solid var(--card-border); padding: 16px; box-shadow: var(--shadow-md); backdrop-filter: blur(10px); }
+    [data-theme="light"] .terminal { background-color: #0f172a; }
+    .terminal-header { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+    .terminal-header .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .terminal-header .red { background: #ff5f56; } .terminal-header .yellow { background: #ffbd2e; } .terminal-header .green { background: #27c93f; }
+    .terminal-title { color: #a1a1aa; font-weight: 500; margin-left: 12px; }
+    .terminal-content { height: 250px; overflow-y: auto; font-family: "JetBrains Mono", "Fira Code", monospace; font-size: 0.85rem; }
+    .terminal-content::-webkit-scrollbar { width: 6px; }
+    .terminal-content::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
+    .terminal-content ul { list-style: none; padding: 0; margin: 0; }
+    .terminal-content li { display: flex; gap: 12px; margin-bottom: 2px; }
+    .terminal-content .log-prefix { color: #4ade80; flex-shrink: 0; }
+    .terminal-content .log-message { color: #cbd5e0; white-space: pre-wrap; }
+
+    /* === Animations & Responsive === */
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; animation-delay: var(--delay, 0s); }
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .main-nav { margin-bottom: 24px; padding: 8px 16px; top: 8px; }
+      .nav-links { position: fixed; top: 75px; left: 0; right: 0; background: var(--bg-glass); backdrop-filter: blur(10px); flex-direction: column; padding: 24px 0; border-bottom: 1px solid var(--card-border); display: none; }
+      .nav-links.active { display: flex; }
+      .hamburger { display: block; }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <svg style="display:none">
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
+    <symbol id="icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
+    <symbol id="icon-docker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 18V9.33a1.6 1.6 0 0 0-.8-1.38l-7.2-4.16a1.6 1.6 0 0 0-1.6 0l-7.2 4.16a1.6 1.6 0 0 0-.8 1.38V18m17 0a1.6 1.6 0 0 1-1.6 1.6h-14a1.6 1.6 0 0 1-1.6-1.6v-3.33a1.6 1.6 0 0 1 1.6-1.6h14a1.6 1.6 0 0 1 1.6 1.6v3.33Z"/><path d="M7 15.33h1.33V16H7zm2.66 0H11V16H9.66zm2.67 0H14V16h-1.67zm2.67 0h1.33V16h-1.33zM7 12.67h1.33V14H7zm2.66 0H11V14H9.66zm2.67 0H14V14h-1.67z"/></symbol>
+    <symbol id="icon-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></symbol>
+    <symbol id="icon-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 8v4"></path></symbol>
+    <symbol id="icon-play-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></symbol>
+    <symbol id="icon-command" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></symbol>
+    <symbol id="icon-layout-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></symbol>
+  </svg>
+
+  <div class="container">
+    <nav class="main-nav">
+      <a href="./dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="./dashboard-index.html" class="nav-link">Dashboard Index</a>
+        <a href="./infra-dashboard.html" class="nav-link">Actual Status</a>
+        <a href="./infra-dashboard-proposal.html" class="nav-link active">Proposal Sim</a>
+        <a href="./infra-dashboard.md" class="nav-link">MD Guide</a>
+      </div>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun"><use href="#icon-sun"></use></svg>
+          <svg id="iconMoon"><use href="#icon-moon"></use></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg id="iconHamburger"><use href="#icon-hamburger"></use></svg>
+          <svg id="iconClose" style="display:none;"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+    </nav>
+    
+    <div>
+      <h1 class="hero-title">Infra Proposal Dashboard</h1>
+      <p class="hero-sub">이 페이지는 <strong>제안서용 시뮬레이션</strong>입니다. 실제 설치를 수행하지 않으며, 설명형 인터랙션으로 학습 흐름을 보여줍니다.</p>
+    </div>
+    <div class="chips-container">
+        <span class="chip">Simulation only</span>
+        <span class="chip">No real command executed</span>
+        <a href="./infra-dashboard.html" class="chip">Actual Dashboard 이동</a>
+    </div>
+
+    <div class="toolbar">
+      <button id="simulateBtn" class="btn btn-primary"><svg><use href="#icon-play-circle"></use></svg>설치 시뮬레이션 시작</button>
+      <button id="resetBtn" class="btn btn-secondary">초기 상태로 리셋</button>
+      <span id="simState">상태: 대기 중</span>
+    </div>
+    
+    <div class="progress-bar-container">
+        <div id="progressText">0%</div>
+        <div class="progress-bar">
+            <div id="progressBarFill"></div>
+        </div>
+    </div>
+    
+    <div class="comparison-grid">
+        <div>
+            <h3>Before</h3>
+            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-top:-12px; margin-bottom: 16px;">개별 로컬 개발 환경</p>
+            <div class="card-grid" id="before-cards"></div>
+        </div>
+        <div>
+            <h3>After (Proposal)</h3>
+            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-top:-12px; margin-bottom: 16px;">통합 원격 개발 환경</p>
+            <div class="card-grid" id="after-cards"></div>
+        </div>
+    </div>
+
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="terminal-title">bash</span>
+      </div>
+      <div class="terminal-content" id="logContainer">
+          <ul id="logList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const base = [
+      { id: "docker", title: "Docker", desc: "컨테이너 런타임", time: "~5min", deps: "None", icon: "docker" },
+      { id: "nginx", title: "Nginx", desc: "Ingress/Reverse Proxy", time: "~2min", deps: "Docker", icon: "server" },
+      { id: "jenkins", title: "Jenkins", desc: "CI/CD Orchestration", time: "~8min", deps: "Docker", icon: "play-circle" },
+      { id: "security", title: "Security Baseline", desc: "UFW + No Public Bind", time: "~1min", deps: "OS", icon: "shield" },
+      { id: "tailscale", title: "Tailscale", desc: "운영 접근 채널", time: "~3min", deps: "Network", icon: "network" },
+      { id: "cli", title: "Ops/AI CLIs", desc: "aws/gh/glab/gemini...", time: "~4min", deps: "OS", icon: "command" },
+      { id: "dashboard", title: "Learning Dashboard", desc: "계층형 가시화", time: "~1min", deps: "Nginx", icon: "layout-dashboard" }
+    ];
+
+    let items = JSON.parse(JSON.stringify(base.map(i => ({...i, status: 'planned'}))));
+    let logs = [];
+    const logListEl = document.getElementById("logList");
+    const logContainerEl = document.getElementById("logContainer");
+
+    function renderCards(containerId, data) {
+      document.getElementById(containerId).innerHTML = data.map((item, index) => `
+        <div class="card fade-in-up" style="--delay: ${index * 0.05}s">
+          <h4><svg><use href="#icon-${item.icon}"></use></svg>${item.title}</h4>
+          <p class="card-details"><strong>Time:</strong> ${item.time} | <strong>Deps:</strong> ${item.deps}</p>
+          <div id="status-${containerId}-${item.id}" class="status-badge ${item.status}">
+            <span class="dot"></span>
+            ${item.status.toUpperCase()}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function updateCardStatus(item) {
+        const badge = document.getElementById(`status-after-cards-${item.id}`);
+        if(badge) {
+            badge.className = `status-badge ${item.status}`;
+            badge.innerHTML = `<span class="dot"></span> ${item.status.toUpperCase()}`;
+        }
+    }
+
+    function addLog(message, prefix = "INFO") {
+      logs.push({ prefix, message });
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="log-prefix">[${prefix}] $</span> <span class="log-message">${message}</span>`;
+      logListEl.appendChild(li);
+      logContainerEl.scrollTop = logContainerEl.scrollHeight;
+    }
+
+    function updateProgress() {
+        const doneCount = items.filter(i => i.status === 'done').length;
+        const totalCount = items.length;
+        const progress = totalCount > 0 ? (doneCount / totalCount) * 100 : 0;
+        document.getElementById('progressBarFill').style.width = `${progress}%`;
+        document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
+    }
+
+    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function simulate() {
+      document.getElementById("simState").textContent = "상태: 시뮬레이션 진행 중...";
+      document.getElementById("simulateBtn").disabled = true;
+      document.getElementById("resetBtn").disabled = true;
+      logs = [];
+      logListEl.innerHTML = "";
+      
+      addLog("Simulation mode activated. 실제 설치는 수행하지 않음.", "START");
+      await wait(500);
+
+      for (const item of items) {
+        item.status = "installing";
+        addLog(`Analyzing dependencies for ${item.title}... [${item.deps}]`, "DEPS");
+        updateCardStatus(item);
+        updateProgress();
+        await wait(300 + Math.random() * 400);
+
+        addLog(`Executing install script for ${item.title}... (takes ${item.time})`, "EXEC");
+        await wait(600 + Math.random() * 500);
+        
+        item.status = "done";
+        addLog(`${item.title}: Installation successful.`, "DONE");
+        updateCardStatus(item);
+        updateProgress();
+
+        await wait(250);
+      }
+
+      addLog("모든 구성요소가 proposal 시나리오에서 설치 완료 상태로 전환됨.", "END");
+      document.getElementById("simState").textContent = "상태: 시뮬레이션 완료";
+      document.getElementById("simulateBtn").disabled = false;
+      document.getElementById("resetBtn").disabled = false;
+    }
+
+    function reset() {
+      items = JSON.parse(JSON.stringify(base.map(i => ({...i, status: 'planned'}))));
+      logs = [];
+      logListEl.innerHTML = "";
+      addLog("초기 미설치 상태로 복원. 시뮬레이션을 시작하세요.", "RESET");
+      
+      const beforeItems = JSON.parse(JSON.stringify(base.map(i => ({...i, status: 'planned'}))));
+      renderCards('before-cards', beforeItems);
+      renderCards('after-cards', items);
+
+      updateProgress();
+      document.getElementById("simState").textContent = "상태: 대기 중";
+    }
+
+    // --- Global Init ---
+    (function() {
+      // --- Theme & Nav ---
+      const themeToggle = document.getElementById("themeToggle");
+      const getTheme = () => localStorage.getItem("ssafy-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const applyTheme = (theme) => { document.documentElement.setAttribute("data-theme", theme); localStorage.setItem("ssafy-theme", theme); };
+      applyTheme(getTheme());
+      themeToggle.addEventListener("click", () => applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+      const hamburgerBtn = document.getElementById("hamburgerBtn"), navLinks = document.getElementById("navLinks"), iconHamburger = document.getElementById("iconHamburger"), iconClose = document.getElementById("iconClose");
+      hamburgerBtn.addEventListener("click", () => {
+        const isActive = navLinks.classList.toggle("active");
+        iconHamburger.style.display = isActive ? "none" : "block"; iconClose.style.display = isActive ? "block" : "none";
+      });
+
+      reset();
+    })();
+  </script>
+</body>
+</html>

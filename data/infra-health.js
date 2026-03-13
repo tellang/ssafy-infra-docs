@@ -1,0 +1,228 @@
+window.INFRA_HEALTH = {
+  "generatedAtUtc": "2026-03-11T05:57:40Z",
+  "source": {
+    "hostAlias": "ssafy-ec2",
+    "mode": "C(auto+manual)",
+    "autoRefreshSeconds": 60,
+    "collection": "async-batch"
+  },
+  "retryPolicy": {
+    "maxRetries": 2,
+    "initialDelaySeconds": 2,
+    "maxDelaySeconds": 8,
+    "backoff": "exponential",
+    "jitter": "0~1500ms"
+  },
+  "summary": {
+    "total": 10,
+    "ok": 9,
+    "warn": 1,
+    "error": 0,
+    "healthScore": 96.0,
+    "baselineStatus": "ok",
+    "baselineSummary": "Infra baseline checks 정상",
+    "baselineChecks": [
+      "ssh_connectivity",
+      "services_core",
+      "security_exposure",
+      "jenkins_loopback",
+      "ufw_policy",
+      "nginx_base_health"
+    ]
+  },
+  "checks": [
+    {
+      "id": "ssh_connectivity",
+      "title": "SSH Connectivity",
+      "severity": "critical",
+      "status": "ok",
+      "summary": "SSH alias + key 접속 가능",
+      "attempts": 1,
+      "durationMs": 948,
+      "checkedAtUtc": "2026-03-11T05:57:39Z",
+      "raw": "ok"
+    },
+    {
+      "id": "services_core",
+      "title": "Core Services",
+      "severity": "critical",
+      "status": "ok",
+      "summary": "docker/nginx/jenkins/tailscaled active",
+      "attempts": 1,
+      "durationMs": 806,
+      "checkedAtUtc": "2026-03-11T05:57:39Z",
+      "raw": "active active active active"
+    },
+    {
+      "id": "security_exposure",
+      "title": "Forbidden Public Bind",
+      "severity": "critical",
+      "status": "ok",
+      "summary": "금지 포트 외부 바인딩 미검출",
+      "attempts": 1,
+      "durationMs": 796,
+      "checkedAtUtc": "2026-03-11T05:57:39Z",
+      "raw": "CLEAN"
+    },
+    {
+      "id": "ufw_policy",
+      "title": "UFW Policy",
+      "severity": "high",
+      "status": "ok",
+      "summary": "UFW active + 핵심 포트 정책 반영",
+      "attempts": 1,
+      "durationMs": 897,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "Status: active\n\nTo                         Action      From\n--                         ------      ----\n22                         ALLOW       Anywhere                  \n8989/tcp                   ALLOW       Anywhere                  \n443                        ALLOW       Anywhere                  \n22/tcp                     ALLOW       Anywhere                  \n80/tcp                     ALLOW       Anywhere                  \n443/tcp                    ALLOW       Anywhere                  \n22 (v6)                    ALLOW       Anywhere (v6)             \n8989/tcp (v6)              ALLOW       Anywhere (v6)             \n443 (v6)                   ALLOW       Anywhere (v6)             \n22/tcp (v6)                ALLOW       Anywhere (v6)             \n80/tcp (v6)                ALLOW       Anywhere (v6)             \n443/tcp (v6)               ALLOW       Anywhere (v6)"
+    },
+    {
+      "id": "jenkins_loopback",
+      "title": "Jenkins Loopback Bind",
+      "severity": "critical",
+      "status": "ok",
+      "summary": "Jenkins loopback bind 유지",
+      "attempts": 1,
+      "durationMs": 390,
+      "checkedAtUtc": "2026-03-11T05:57:39Z",
+      "raw": "LISTEN 0      50             [::ffff:127.0.0.1]:8080             *:*    users:((\"java\",pid=66866,fd=9))"
+    },
+    {
+      "id": "tailscale_node",
+      "title": "Tailscale Node",
+      "severity": "high",
+      "status": "ok",
+      "summary": "Tailnet 등록 노드 확인",
+      "attempts": 1,
+      "durationMs": 426,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "ssafy-ec2-2nd|100.109.81.63"
+    },
+    {
+      "id": "nginx_base_health",
+      "title": "Nginx Base Health (/healthz)",
+      "severity": "critical",
+      "status": "ok",
+      "summary": "Nginx baseline(/healthz) 응답 정상",
+      "attempts": 1,
+      "durationMs": 429,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "HTTP/1.1 200 OK"
+    },
+    {
+      "id": "app_upstream_http",
+      "title": "App Upstream HTTP (/)",
+      "severity": "medium",
+      "status": "warn",
+      "summary": "앱 upstream(/) 미배포/비정상 가능 (infra baseline 영향 없음)",
+      "attempts": 1,
+      "durationMs": 367,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "HTTP/1.1 502 Bad Gateway"
+    },
+    {
+      "id": "ec2_spec",
+      "title": "EC2 Resource Spec",
+      "severity": "low",
+      "status": "ok",
+      "summary": "vCPU|RAM|Disk: 4|15Gi|309G",
+      "attempts": 1,
+      "durationMs": 370,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "4|15Gi|309G"
+    },
+    {
+      "id": "branch_scope",
+      "title": "Jenkins Branch Scope",
+      "severity": "high",
+      "status": "ok",
+      "summary": "서비스 접두 브랜치(glob) 분리 반영",
+      "attempts": 1,
+      "durationMs": 13,
+      "checkedAtUtc": "2026-03-11T05:57:40Z",
+      "raw": "checked: C:\\Users\\SSAFY\\Desktop\\Projects\\ssafy\\ssafy-infra\\jenkins\\jobdsl\\ssafy-monorepo.groovy"
+    }
+  ],
+  "timeline": [
+    {
+      "stage": "Precheck",
+      "why": "접근/자산/환경 선확인",
+      "what": "SSH 키/호스트/자산 동기화",
+      "evidence": "scripts/local/prepare-local.ps1"
+    },
+    {
+      "stage": "Bootstrap",
+      "why": "기본 인프라 일관 설치",
+      "what": "Docker/Nginx/Jenkins/Tailscale/CLI 설치",
+      "evidence": "scripts/ec2/bootstrap-base.sh"
+    },
+    {
+      "stage": "Security",
+      "why": "내부포트 외부노출 차단",
+      "what": "UFW/loopback/forbidden bind 점검",
+      "evidence": "scripts/ec2/network-exposure-audit.sh"
+    },
+    {
+      "stage": "CI/CD",
+      "why": "모노레포 분리 배포",
+      "what": "be/fe/ai branch scope + trigger 정책",
+      "evidence": "jenkins/jobdsl/ssafy-monorepo.groovy"
+    },
+    {
+      "stage": "Observability",
+      "why": "주니어 학습형 가시화",
+      "what": "토글 문서 + hover 구조도 + plan vs actual",
+      "evidence": "docs/infra-dashboard.html"
+    }
+  ],
+  "planVsActual": [
+    {
+      "item": "Core services active",
+      "expected": "docker/nginx/jenkins/tailscaled 모두 active",
+      "actualStatus": "ok",
+      "actualSummary": "docker/nginx/jenkins/tailscaled active",
+      "evidence": "active active active active"
+    },
+    {
+      "item": "Nginx baseline health",
+      "expected": "/healthz 응답 정상(200/204/301/302/403)",
+      "actualStatus": "ok",
+      "actualSummary": "Nginx baseline(/healthz) 응답 정상",
+      "evidence": "HTTP/1.1 200 OK"
+    },
+    {
+      "item": "App upstream HTTP",
+      "expected": "/ 응답(앱 미배포 시 WARN 허용)",
+      "actualStatus": "warn",
+      "actualSummary": "앱 upstream(/) 미배포/비정상 가능 (infra baseline 영향 없음)",
+      "evidence": "HTTP/1.1 502 Bad Gateway"
+    },
+    {
+      "item": "No forbidden public bind",
+      "expected": "5432/6379/3306/27017/8080 외부 바인딩 없음",
+      "actualStatus": "ok",
+      "actualSummary": "금지 포트 외부 바인딩 미검출",
+      "evidence": "CLEAN"
+    },
+    {
+      "item": "Jenkins loopback",
+      "expected": "127.0.0.1:8080 bind",
+      "actualStatus": "ok",
+      "actualSummary": "Jenkins loopback bind 유지",
+      "evidence": "LISTEN 0      50             [::ffff:127.0.0.1]:8080             *:*    users:((\"java\",pid=66866,fd=9))"
+    },
+    {
+      "item": "UFW baseline",
+      "expected": "UFW active + 22/80/443 정책",
+      "actualStatus": "ok",
+      "actualSummary": "UFW active + 핵심 포트 정책 반영",
+      "evidence": "Status: active\n\nTo                         Action      From\n--                         ------      ----\n22                         ALLOW       Anywhere                  \n8989/tcp                   ALLOW       Anywhere                  \n443                        ALLOW       Anywhere                  \n22/tcp                     ALLOW       Anywhere                  \n80/tcp                     ALLOW       Anywhere                  \n443/tcp                    ALLOW       Anywhere                  \n22 (v6)                    ALLOW       Anywhere (v6)             \n8989/tcp (v6)              ALLOW       Anywhere (v6)             \n443 (v6)                   ALLOW       Anywhere (v6)             \n22/tcp (v6)                ALLOW       Anywhere (v6)             \n80/tcp (v6)                ALLOW       Anywhere (v6)             \n443/tcp (v6)               ALLOW       Anywhere (v6)"
+    },
+    {
+      "item": "Jenkins branch scope",
+      "expected": "be/fe/ai 접두 branch glob 분리",
+      "actualStatus": "ok",
+      "actualSummary": "서비스 접두 브랜치(glob) 분리 반영",
+      "evidence": "checked: C:\\Users\\SSAFY\\Desktop\\Projects\\ssafy\\ssafy-infra\\jenkins\\jobdsl\\ssafy-monorepo.groovy"
+    }
+  ]
+};

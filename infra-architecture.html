@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSAFY Infra Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-glass: rgba(248, 250, 252, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #4f46e5;
+      --accent-light: #6366f1;
+      --accent-glow: rgba(79, 70, 229, 0.2);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.06);
+      --radius: 12px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --gradient-bg: radial-gradient(circle at 100% 0%, #f0f9ff 0%, #f8fafc 50%, #faf5ff 100%);
+      --main-color: #2563eb;
+      --dev-color: #f97316;
+      --danger-color: #ef4444;
+      --ok-color: #22c55e;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-glass: rgba(10, 10, 15, 0.6);
+      --card-bg: rgba(24, 24, 33, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f8fafc;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #818cf8;
+      --accent-light: #a78bfa;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --gradient-bg: radial-gradient(circle at 0% 100%, #0a0a0f 0%, #171c2c 50%, #0a0a0f 100%);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background-color: var(--bg);
+      background-image: var(--gradient-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Nav */
+    .main-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px; margin-bottom: 32px;
+      background: var(--bg-glass); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      position: sticky; top: 16px; z-index: 100;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
+    .nav-logo-accent { color: var(--accent); }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
+    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
+    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
+
+    /* Hero */
+    .hero-title {
+      font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em;
+      background: var(--gradient-hero); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 8px; line-height: 1.2; text-align: center;
+    }
+    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; text-align: center; }
+
+    /* Section */
+    .section {
+      background: var(--card-bg); backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 28px; margin-bottom: 24px;
+    }
+    .section-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; }
+    .section-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px; }
+
+    /* Mermaid container */
+    .mermaid-wrap {
+      background: #ffffff; border-radius: 10px; padding: 20px;
+      border: 1px solid #e2e8f0; overflow-x: auto;
+    }
+    [data-theme="dark"] .mermaid-wrap {
+      background: #1e1e2e; border-color: rgba(255,255,255,0.1);
+    }
+
+    /* Table */
+    .port-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+    .port-table th, .port-table td { border: 1px solid var(--card-border); padding: 10px 14px; text-align: left; }
+    .port-table th { background: var(--accent-glow); font-weight: 600; }
+    .port-table tr:hover { background: var(--accent-glow); }
+    .badge-public { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #dcfce7; color: #166534; }
+    .badge-internal { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #fef3c7; color: #92400e; }
+    .badge-forbidden { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #fecaca; color: #991b1b; }
+    [data-theme="dark"] .badge-public { background: #1c2b22; color: #86efac; }
+    [data-theme="dark"] .badge-internal { background: #2b2517; color: #fcd34d; }
+    [data-theme="dark"] .badge-forbidden { background: #2b1717; color: #fca5a5; }
+
+    /* Rule cards */
+    .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
+    .rule-card {
+      border: 1px solid var(--card-border); border-radius: 10px; padding: 16px;
+      background: var(--bg-glass); backdrop-filter: blur(10px);
+    }
+    .rule-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+    .rule-card p { font-size: 0.85rem; color: var(--text-secondary); }
+
+    code { background: var(--accent-glow); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+
+    footer { margin-top: 48px; text-align: center; font-size: 0.85rem; color: var(--text-muted); padding-bottom: 32px; }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2rem; }
+      .container { padding: 16px; }
+      .main-nav { padding: 8px 16px; top: 8px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <nav class="main-nav">
+      <a href="./index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links">
+        <a href="./index.html" class="nav-link">Home</a>
+        <a href="./infra-architecture.html" class="nav-link active">Architecture</a>
+        <a href="./infra-dashboard.html" class="nav-link">Actual Status</a>
+        <a href="./infra-dashboard-proposal.html" class="nav-link">Proposal</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </nav>
+
+    <header>
+      <h1 class="hero-title">Infrastructure Architecture</h1>
+      <p class="hero-sub">SSAFY A408 EC2 인프라 구조도 | j14a408.p.ssafy.io</p>
+    </header>
+
+    <!-- 1. 네트워크 아키텍처 -->
+    <section class="section">
+      <h2 class="section-title">1. Network Architecture</h2>
+      <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해서만 진입하고, 내부 서비스는 loopback에서만 동작합니다.</p>
+      <div class="mermaid-wrap">
+        <pre class="mermaid">
+graph TD
+    Internet(("Internet"))
+
+    subgraph EC2["EC2 : j14a408.p.ssafy.io (4vCPU / 15GB RAM)"]
+        direction TB
+        Nginx["Nginx\nReverse Proxy\n80 / 443"]
+        Jenkins["Jenkins CI/CD\n127.0.0.1:8080"]
+        Tailscale["Tailscale VPN\n(Ops Access)"]
+
+        subgraph MainPlane["Main Plane"]
+            direction LR
+            BE_M["be-main\n:7101"]
+            FE_M["fe-main\n:7102"]
+            AI_M["ai-main\n:7103"]
+            PG_M[("PostgreSQL\n:7432")]
+            RD_M[("Redis\n:7379")]
+        end
+
+        subgraph DevPlane["Dev Plane"]
+            direction LR
+            BE_D["be-dev\n:7201"]
+            FE_D["fe-dev\n:7202"]
+            AI_D["ai-dev\n:7203"]
+            PG_D[("PostgreSQL\n:8432")]
+            RD_D[("Redis\n:8379")]
+        end
+    end
+
+    Internet -->|"80 / 443"| Nginx
+    Internet -->|"22 (SSH)"| EC2
+
+    Nginx -->|"path routing"| BE_M & FE_M & AI_M
+    Nginx -->|"path routing"| BE_D & FE_D & AI_D
+
+    BE_M --> PG_M & RD_M
+    AI_M --> PG_M
+    BE_D --> PG_D & RD_D
+    AI_D --> PG_D
+
+    Jenkins -->|"deploy"| MainPlane
+    Jenkins -->|"deploy"| DevPlane
+
+    style MainPlane fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style DevPlane fill:#ffedd5,stroke:#f97316,stroke-width:2px
+    style Internet fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+        </pre>
+      </div>
+    </section>
+
+    <!-- 2. CI/CD 파이프라인 -->
+    <section class="section">
+      <h2 class="section-title">2. CI/CD Pipeline</h2>
+      <p class="section-desc">Jenkins Multibranch Pipeline이 be/fe/ai 각 영역을 독립적으로 빌드/배포합니다.</p>
+      <div class="mermaid-wrap">
+        <pre class="mermaid">
+graph LR
+    subgraph Trigger["GitLab Events"]
+        Push["Push to\n*/dev"]
+        PR["PR Merge to\n*/main"]
+        Feat["Push to\n*/feature/*"]
+    end
+
+    subgraph Jenkins["Jenkins Multibranch"]
+        J_BE["be pipeline"]
+        J_FE["fe pipeline"]
+        J_AI["ai pipeline"]
+    end
+
+    subgraph Actions["Deployment"]
+        DevDeploy["Auto Deploy\nto Dev Plane"]
+        MainDeploy["Auto Deploy\nto Main Plane"]
+        TestOnly["Test Only\nNo Deploy"]
+    end
+
+    Push --> J_BE & J_FE & J_AI --> DevDeploy
+    PR --> J_BE & J_FE & J_AI --> MainDeploy
+    Feat --> J_BE & J_FE & J_AI --> TestOnly
+
+    style DevDeploy fill:#ffedd5,stroke:#f97316,stroke-width:2px
+    style MainDeploy fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style TestOnly fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px
+        </pre>
+      </div>
+      <div class="rule-grid">
+        <div class="rule-card">
+          <h4>Dev Deploy</h4>
+          <p><code>*/dev</code> 브랜치 push 시 자동 배포. 빠른 통합 검증용.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Main Deploy</h4>
+          <p><code>*/main</code> PR merge 시 자동 배포. 승인된 변경만 반영.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Feature Branch</h4>
+          <p><code>*/feature/*</code> 빌드+테스트만. 운영 영향 차단.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Data 분리 -->
+    <section class="section">
+      <h2 class="section-title">3. Data Isolation</h2>
+      <p class="section-desc">Main과 Dev 환경의 DB/Redis는 완전 분리합니다. cross-access 금지.</p>
+      <div class="mermaid-wrap">
+        <pre class="mermaid">
+graph TB
+    subgraph Main["Main Environment"]
+        direction LR
+        M_BE["be-main"] --> M_DB[("PostgreSQL\n:7432")]
+        M_BE --> M_RD[("Redis\n:7379")]
+        M_AI["ai-main"] --> M_DB
+    end
+
+    subgraph Dev["Dev Environment"]
+        direction LR
+        D_BE["be-dev"] --> D_DB[("PostgreSQL\n:8432")]
+        D_BE --> D_RD[("Redis\n:8379")]
+        D_AI["ai-dev"] --> D_DB
+    end
+
+    Main -.-|"Cross-Access 금지"| Dev
+
+    style Main fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style Dev fill:#ffedd5,stroke:#f97316,stroke-width:2px
+        </pre>
+      </div>
+    </section>
+
+    <!-- 4. 포트 레퍼런스 -->
+    <section class="section">
+      <h2 class="section-title">4. Port Reference</h2>
+      <table class="port-table">
+        <thead>
+          <tr><th>Port</th><th>Service</th><th>Bind</th><th>Level</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>80</code></td><td>Nginx HTTP</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
+          <tr><td><code>443</code></td><td>Nginx HTTPS</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
+          <tr><td><code>22</code></td><td>SSH</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
+          <tr><td><code>8989</code></td><td>Gerrit (optional)</td><td>0.0.0.0</td><td><span class="badge-public">Public</span></td></tr>
+          <tr><td><code>8080</code></td><td>Jenkins</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>7101-7103</code></td><td>Main (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>7201-7203</code></td><td>Dev (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>7432 / 7379</code></td><td>Main DB / Redis</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>8432 / 8379</code></td><td>Dev DB / Redis</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>5432 / 6379 / 3306</code></td><td>DB defaults</td><td>-</td><td><span class="badge-forbidden">Forbidden</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5. 보안 규칙 -->
+    <section class="section">
+      <h2 class="section-title">5. Security Rules</h2>
+      <div class="rule-grid">
+        <div class="rule-card">
+          <h4>Public Bind 제한</h4>
+          <p><code>5432/6379/3306/27017/8080</code>의 <code>0.0.0.0</code> 바인딩 금지.</p>
+        </div>
+        <div class="rule-card">
+          <h4>SSH 강화</h4>
+          <p>Password 로그인 비활성화. Root 직접 로그인 차단. Key-only 접근.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Jenkins 접근 제어</h4>
+          <p>Nginx reverse proxy 경유. <code>JENKINS_ALLOW_CIDR</code>로 IP 제한.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Credential 관리</h4>
+          <p><code>.env</code>, <code>.pem</code> Git 추적 금지. Jenkins credential store 우선.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Tailscale Auth</h4>
+          <p>Auth key 주기적 회전. Host-level VPN으로 운영자 접근 이중화.</p>
+        </div>
+        <div class="rule-card">
+          <h4>Data Isolation</h4>
+          <p>Main/Dev DB, Redis 완전 분리. Cross-environment access ACL 금지.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      SSAFY A408 Infrastructure Architecture &copy; 2026
+    </footer>
+  </main>
+
+  <script>
+    // Theme
+    const themeToggle = document.getElementById("themeToggle");
+    const getTheme = () => localStorage.getItem("ssafy-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const applyTheme = (theme) => {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("ssafy-theme", theme);
+      document.getElementById("iconSun").style.display = theme === "dark" ? "block" : "none";
+      document.getElementById("iconMoon").style.display = theme === "dark" ? "none" : "block";
+    };
+    applyTheme(getTheme());
+    themeToggle.addEventListener("click", () => applyTheme(getTheme() === "dark" ? "light" : "dark"));
+
+    // Mermaid init (theme-aware)
+    const mermaidTheme = getTheme() === "dark" ? "dark" : "default";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: mermaidTheme,
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
+      securityLevel: "loose"
+    });
+  </script>
+</body>
+</html>

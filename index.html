@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSAFY Infra Dashboard Index</title>
+  <style>
+    /* === Design System & Base Styles === */
+    :root {
+      --bg: #f8fafc;
+      --bg-glass: rgba(248, 250, 252, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #4f46e5;
+      --accent-light: #6366f1;
+      --accent-glow: rgba(79, 70, 229, 0.2);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --gradient-bg: radial-gradient(circle at 100% 0%, #f0f9ff 0%, #f8fafc 50%, #faf5ff 100%);
+      --status-ok-bg: #dcfce7; --status-ok-text: #166534; --status-ok-dot: #22c55e;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-glass: rgba(10, 10, 15, 0.6);
+      --card-bg: rgba(24, 24, 33, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f8fafc;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #818cf8;
+      --accent-light: #a78bfa;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --gradient-bg: radial-gradient(circle at 0% 100%, #0a0a0f 0%, #171c2c 50%, #0a0a0f 100%);
+      --status-ok-bg: #1c2b22; --status-ok-text: #86efac; --status-ok-dot: #4ade80;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background-color: var(--bg);
+      background-image: var(--gradient-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background var(--transition), color var(--transition);
+    }
+    
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    
+    /* === Navigation === */
+    .main-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px; margin-bottom: 32px;
+      background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      position: sticky; top: 16px; z-index: 100;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
+    .nav-logo-accent { color: var(--accent); }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .nav-controls { display: flex; align-items: center; gap: 16px; }
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); }
+    
+    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
+    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
+    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
+    #iconMoon { display: block; } #iconSun { display: none; }
+    [data-theme="dark"] #iconMoon { display: none; } [data-theme="dark"] #iconSun { display: block; }
+    
+    /* === Typography & Hero === */
+    .hero-title { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.04em; background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; margin-bottom: 8px; line-height: 1.2; text-align: center; }
+    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 48px; max-width: 600px; text-align: center; margin-left: auto; margin-right: auto;}
+
+    /* === Cards === */
+    .card-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .card { background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); transition: all var(--transition); position: relative; overflow: hidden; text-decoration: none; color: inherit; display: block; }
+    .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md), 0 0 24px var(--accent-glow); border-color: var(--accent); }
+    .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .card-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent) -20%, var(--accent-light) 120%); }
+    .card-icon svg { width: 24px; height: 24px; stroke: white; }
+    .card-title { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); }
+    .card-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+    .card-footer { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); }
+    .status-indicator { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 6px; background-color: var(--status-ok-bg); color: var(--status-ok-text); font-weight: 500; }
+    .status-indicator .dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--status-ok-dot); animation: pulse-ok 2s infinite; }
+
+    /* === Section === */
+    .section { margin-top: 56px; padding: 24px; background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: var(--radius); }
+    .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .section-title svg { width: 24px; height: 24px; stroke: var(--accent); }
+    
+    .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .list-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 0.95rem; }
+    .list-item .icon { width: 20px; height: 20px; stroke: var(--accent-light); }
+    
+    pre { background: #020617; color: #e2e8f0; border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.875rem; font-family: "JetBrains Mono", "Fira Code", monospace; }
+    [data-theme="light"] pre { background: #0f172a; }
+    
+    /* === Footer === */
+    footer { margin-top: 48px; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+    
+    /* === Animations & Responsive === */
+    @keyframes pulse-ok { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-ok-dot) 70%, transparent); } 70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); } }
+    .reveal-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .card-grid > .reveal-on-scroll:nth-child(1) { transition-delay: 0.1s; }
+    .card-grid > .reveal-on-scroll:nth-child(2) { transition-delay: 0.2s; }
+    .card-grid > .reveal-on-scroll:nth-child(3) { transition-delay: 0.3s; }
+    
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.2rem; }
+      .container { padding: 16px; }
+      .main-nav { margin-bottom: 24px; padding: 8px 16px; top: 8px; }
+      .nav-links { position: fixed; top: 75px; left: 0; right: 0; background: var(--bg-glass); backdrop-filter: blur(10px); flex-direction: column; padding: 24px 0; border-bottom: 1px solid var(--card-border); display: none; }
+      .nav-links.active { display: flex; }
+      .hamburger { display: block; }
+      .two-col-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SVG Icon Definitions -->
+  <svg style="display:none">
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
+    <symbol id="icon-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></symbol>
+    <symbol id="icon-proposal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 14h-.01"></path><path d="M12.5 17h-.01"></path><path d="M9.5 14h-.01"></path><path d="M6.5 17h-.01"></path><path d="M18.5 11h-.01"></path><path d="m22 2-3 3"></path><path d="M22 2v5h-5"></path><path d="M2 12v5.5a3.5 3.5 0 0 0 3.5 3.5h13A3.5 3.5 0 0 0 22 17.5V9.83a3.5 3.5 0 0 0-1.02-2.4l-4.24-4.24A3.5 3.5 0 0 0 14.17 2H5.5A3.5 3.5 0 0 0 2 5.5Z"></path></symbol>
+    <symbol id="icon-guide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></symbol>
+    <symbol id="icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></symbol>
+    <symbol id="icon-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.05-3.11.66-.06 1.32-.12 2-.2.88-.08 1.76-.19 2.64-.33.88-.14 1.76-.3 2.64-.5.88-.2 1.76-.44 2.64-.73.88-.29 1.76-.63 2.64-1.03.88-.4 1.76-.85 2.64-1.35.88-.5 1.76-1.05 2.64-1.65.88-.6 1.76-1.28 2.64-2.02s1.6-1.6 2.1-2.5c.5-.9.6-2-.3-3.1s-2.2-1.8-3.1-.3c-.9.5-1.82 1.1-2.5 2.1s-1.42 1.76-2.02 2.64c-.6.88-1.15 1.76-1.65 2.64s-.83 1.76-1.35 2.64c-.52.88-1.04 1.76-1.59 2.64s-1.19 1.76-1.89 2.64c-.7.88-1.49 1.76-2.37 2.64s-1.86 1.76-2.93 2.64c-1.07.88-2.23 1.76-3.48 2.64-1.25.88-2.6 1.76-4.03 2.64-1.43.88-2.95 1.76-4.5 2.64-1.55.88-3.15 1.76-4.8 2.64"></path><path d="m15 12-3 3"></path></symbol>
+    <symbol id="icon-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></symbol>
+  </svg>
+
+  <main class="container">
+    <nav class="main-nav">
+      <a href="#" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="./index.html" class="nav-link active">Home</a>
+        <a href="./infra-architecture.html" class="nav-link">Architecture</a>
+        <a href="./infra-dashboard.html" class="nav-link">Actual Status</a>
+        <a href="./infra-dashboard-proposal.html" class="nav-link">Proposal</a>
+      </div>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun"><use href="#icon-sun"></use></svg>
+          <svg id="iconMoon"><use href="#icon-moon"></use></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg id="iconHamburger"><use href="#icon-hamburger"></use></svg>
+          <svg id="iconClose" style="display:none;"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+    </nav>
+    
+    <header class="reveal-on-scroll">
+      <h1 class="hero-title">SSAFY A408 Infra Portal</h1>
+      <p class="hero-sub">주니어 개발자 온보딩을 위한 인프라 대시보드입니다. 현재 상태 확인, 개선안 검토, 운영 가이드로 빠르게 이동하세요.</p>
+    </header>
+
+    <section class="card-grid">
+      <a href="./infra-dashboard.html" class="card reveal-on-scroll">
+        <div class="card-header">
+          <div class="card-icon"><svg><use href="#icon-dashboard"></use></svg></div>
+          <h2 class="card-title">Actual Dashboard</h2>
+        </div>
+        <p class="card-desc">현재 운영 상태를 JSON 기반으로 시각화한 실측 대시보드입니다. 실제 health를 확인하여 오판을 줄입니다.</p>
+        <div class="card-footer">
+            <span class="status-indicator"><span class="dot"></span>OK</span>
+            <span>Last check: 2 min ago</span>
+        </div>
+      </a>
+
+      <a href="./infra-dashboard-proposal.html" class="card reveal-on-scroll">
+        <div class="card-header">
+          <div class="card-icon"><svg><use href="#icon-proposal"></use></svg></div>
+          <h2 class="card-title">Proposal Dashboard</h2>
+        </div>
+        <p class="card-desc">목표 아키텍처 및 개선 방향 중심의 제안 대시보드입니다. 변경 전후 차이를 명확히 설명합니다.</p>
+        <div class="card-footer">
+            <span class="status-indicator" style="background-color: var(--accent-glow); color: var(--accent);"><span class="dot" style="background-color: var(--accent); animation: none;"></span>Sim</span>
+            <span>Pre-install simulation</span>
+        </div>
+      </a>
+
+      <a href="./infra-architecture.html" class="card reveal-on-scroll">
+        <div class="card-header">
+          <div class="card-icon"><svg><use href="#icon-server"></use></svg></div>
+          <h2 class="card-title">Architecture</h2>
+        </div>
+        <p class="card-desc">Mermaid 기반 인프라 구조도입니다. 네트워크 토폴로지, CI/CD 파이프라인, 데이터 분리 정책을 시각화합니다.</p>
+        <div class="card-footer">
+            <span>&nbsp;</span>
+            <span>Diagrams</span>
+        </div>
+      </a>
+    </section>
+
+    <section class="section reveal-on-scroll" style="transition-delay: 0.4s;">
+      <div class="two-col-grid">
+        <div>
+          <h3 class="section-title"><svg><use href="#icon-info"></use></svg>Project Overview</h3>
+          <div class="list-item"><svg class="icon"><use href="#icon-server"></use></svg> <div><strong>Team:</strong> A408</div></div>
+          <div class="list-item"><svg class="icon"><use href="#icon-server"></use></svg> <div><strong>EC2 Spec:</strong> t2.micro (Demo)</div></div>
+          <div class="list-item"><svg class="icon"><use href="#icon-zap"></use></svg> <div><strong>Services:</strong> FE, BE, AI, DB, CI/CD</div></div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 16px;">본 프로젝트는 SSAFY 교육생의 효율적인 학습과 배포 자동화 경험을 위한 데모 인프라입니다.</p>
+        </div>
+        <div>
+           <h3 class="section-title"><svg><use href="#icon-rocket"></use></svg>Quick Start Guide</h3>
+            <div class="list-item"><svg class="icon"><use href="#icon-terminal"></use></svg> <div><strong>Step 1:</strong> VPN 접속 및 SSH 키 확인</div></div>
+            <div class="list-item"><svg class="icon"><use href="#icon-terminal"></use></svg> <div><strong>Step 2:</strong> 아래 명령어로 데이터 갱신</div></div>
+            <div class="list-item"><svg class="icon"><use href="#icon-dashboard"></use></svg> <div><strong>Step 3:</strong> Actual Dashboard에서 상태 확인</div></div>
+        </div>
+      </div>
+       <h3 class="section-title" style="margin-top: 24px;"><svg><use href="#icon-terminal"></use></svg>Dashboard Refresh Command</h3>
+      <pre><code>pwsh -File scripts/local/refresh-infra-dashboard-data.ps1 -HostAlias ssafy-ec2</code></pre>
+    </section>
+
+    <footer class="reveal-on-scroll" style="transition-delay: 0.5s;">
+      SSAFY A408 Infrastructure Dashboard &copy; 2026
+    </footer>
+  </main>
+
+  <script>
+    (function() {
+      // --- Theme Switcher ---
+      const themeToggle = document.getElementById("themeToggle");
+      const getTheme = () => localStorage.getItem("ssafy-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const applyTheme = (theme) => {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("ssafy-theme", theme);
+      };
+      applyTheme(getTheme());
+      themeToggle.addEventListener("click", () => applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+        if (!localStorage.getItem("ssafy-theme")) {
+          applyTheme(e.matches ? "dark" : "light");
+        }
+      });
+      
+      // --- Scroll Reveal ---
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+      // --- Hamburger Menu ---
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const navLinks = document.getElementById("navLinks");
+      const iconHamburger = document.getElementById("iconHamburger");
+      const iconClose = document.getElementById("iconClose");
+
+      hamburgerBtn.addEventListener("click", () => {
+        navLinks.classList.toggle("active");
+        const isActive = navLinks.classList.contains("active");
+        iconHamburger.style.display = isActive ? "none" : "block";
+        iconClose.style.display = isActive ? "block" : "none";
+      });
+    })();
+  </script>
+</body>
+</html>
