@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SSAFY Infra Architecture</title>
+  <title>SSAFY 인프라 아키텍처 가이드</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <style>
     :root {
@@ -59,22 +60,22 @@
     .main-nav {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 24px; margin-bottom: 32px;
-      background: var(--bg-glass); backdrop-filter: blur(10px);
+      background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--card-border); border-radius: var(--radius);
       position: sticky; top: 16px; z-index: 100;
     }
     .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
     .nav-logo-accent { color: var(--accent); }
     .nav-links { display: flex; gap: 16px; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
-    .nav-link:hover { color: var(--text-primary); }
-    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 12px; transition: all var(--transition); border-radius: 8px; }
+    .nav-link:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+    .nav-link.active { color: white; background: var(--accent); }
     .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
     .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
     .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
 
     /* Hero */
-    .hero-title {
+    .hero {
       font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em;
       background: var(--gradient-hero); -webkit-background-clip: text;
       -webkit-text-fill-color: transparent; background-clip: text;
@@ -136,28 +137,31 @@
 <body>
   <main class="container">
     <nav class="main-nav">
-      <a href="./index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
       <div class="nav-links">
-        <a href="./index.html" class="nav-link">Home</a>
-        <a href="./infra-architecture.html" class="nav-link active">Architecture</a>
-        <a href="./infra-dashboard.html" class="nav-link">Actual Status</a>
-        <a href="./infra-dashboard-proposal.html" class="nav-link">Proposal</a>
+        <a href="dashboard-index.html" class="nav-link">인덱스</a>
+        <a href="infra-dashboard.html" class="nav-link">실시간 대시보드</a>
+        <a href="infra-architecture.html" class="nav-link active">아키텍처</a>
       </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
     </nav>
 
     <header>
-      <h1 class="hero-title">Infrastructure Architecture</h1>
-      <p class="hero-sub">SSAFY A408 EC2 인프라 구조도 | j14a408.p.ssafy.io</p>
+      <div class="hero">
+        <h1 class="hero-title">인프라 아키텍처 상세 가이드</h1>
+        <p class="hero-sub">SSAFY 2학기 프로젝트를 위한 표준 인프라 구성도 및 서비스 간 통신 흐름을 설명합니다.</p>
+      </div>
     </header>
 
     <!-- 1. 네트워크 아키텍처 -->
     <section class="section">
       <h2 class="section-title">1. Network Architecture</h2>
-      <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해서만 진입하고, 내부 서비스는 loopback에서만 동작합니다.</p>
+      <p class="section-desc">외부 트래픽은 Nginx(80/443)를 통해 FE 컨테이너로만 진입합니다. 전체 서비스는 <strong>FE → BE → AI → External LLM</strong> 순으로 선형적인 요청 흐름을 가지며, 모든 서비스는 개별 Docker 컨테이너로 구성됩니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryColor': '#e0e7ff', 'primaryBorderColor': '#4f46e5', 'primaryTextColor': '#0f172a'}}}%%
@@ -169,18 +173,20 @@ graph LR
 
         subgraph MainPlane["Main Plane (Docker)"]
             direction LR
-            M_FE["FE\n:7102"] ==> M_BE["BE\n:7101"] ==> M_AI["AI\n:7103"]
-            M_BE -.-> M_DB[("DB :7432")]
-            M_BE -.-> M_RD[("Redis :7379")]
+            M_FE["fe-main\n:7102"] ==> M_BE["be-main\n:7101"] ==> M_AI["ai-main\n:7103"]
+            M_BE -.-> M_DB[("postgres-main\n:7432")]
+            M_BE -.-> M_RD_BE[("redis-be\n:7379")]
             M_AI -.-> M_DB
+            M_AI -.-> M_RD_AI[("redis-ai\n:7380")]
         end
 
         subgraph DevPlane["Dev Plane (Docker)"]
             direction LR
-            D_FE["FE\n:7202"] ==> D_BE["BE\n:7201"] ==> D_AI["AI\n:7203"]
-            D_BE -.-> D_DB[("DB :8432")]
-            D_BE -.-> D_RD[("Redis :8379")]
+            D_FE["fe-dev\n:7202"] ==> D_BE["be-dev\n:7201"] ==> D_AI["ai-dev\n:7203"]
+            D_BE -.-> D_DB[("postgres-dev\n:8432")]
+            D_BE -.-> D_RD_BE[("redis-be\n:8379")]
             D_AI -.-> D_DB
+            D_AI -.-> D_RD_AI[("redis-ai\n:8380")]
         end
 
         subgraph Infra["Infra"]
@@ -246,28 +252,30 @@ graph LR
     <!-- 3. Data 분리 -->
     <section class="section">
       <h2 class="section-title">3. Data Isolation</h2>
-      <p class="section-desc">Main과 Dev 환경의 DB/Redis는 완전 분리합니다. cross-access 금지.</p>
+      <p class="section-desc">Main과 Dev 환경은 완전히 분리된 Docker 환경(네트워크, 컨테이너)을 가집니다. BE는 PostgreSQL(읽기/쓰기) 및 Redis(세션/캐시)에, AI는 PostgreSQL(읽기)에 연결되며, FE는 DB/Redis에 직접 접근하지 않습니다.</p>
       <div class="mermaid-wrap">
         <pre class="mermaid">
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#334155', 'primaryTextColor': '#0f172a'}}}%%
 graph TB
-    subgraph Main["Main Docker Containers"]
+    subgraph Main["Main Plane (Docker)"]
         direction LR
-        M_FE["FE :7102"] ==> M_BE["BE :7101"] ==> M_AI["AI :7103"]
-        M_BE -.-> M_DB[("PostgreSQL\n:7432")]
-        M_BE -.-> M_RD[("Redis\n:7379")]
+        M_FE["fe-main :7102"] ==> M_BE["be-main :7101"] ==> M_AI["ai-main :7103"]
+        M_BE -.-> M_DB[("postgres-main\n:7432")]
+        M_BE -.-> M_RD_BE[("redis-be :7379")]
         M_AI -.-> M_DB
+        M_AI -.-> M_RD_AI[("redis-ai :7380")]
     end
 
-    subgraph Dev["Dev Docker Containers"]
+    subgraph Dev["Dev Plane (Docker)"]
         direction LR
-        D_FE["FE :7202"] ==> D_BE["BE :7201"] ==> D_AI["AI :7203"]
-        D_BE -.-> D_DB[("PostgreSQL\n:8432")]
-        D_BE -.-> D_RD[("Redis\n:8379")]
+        D_FE["fe-dev :7202"] ==> D_BE["be-dev :7201"] ==> D_AI["ai-dev :7203"]
+        D_BE -.-> D_DB[("postgres-dev\n:8432")]
+        D_BE -.-> D_RD_BE[("redis-be :8379")]
         D_AI -.-> D_DB
+        D_AI -.-> D_RD_AI[("redis-ai :8380")]
     end
 
-    Main <---->|"Cross-Access 금지\n별도 인스턴스 / 계정 / 백업"| Dev
+    Main <---->|"Cross-Access 금지\n별도 컨테이너 및 분리 환경"| Dev
 
     style Main fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
     style Dev fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#431407
@@ -290,8 +298,10 @@ graph TB
           <tr><td><code>8080</code></td><td>Jenkins</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
           <tr><td><code>7101-7103</code></td><td>Main (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
           <tr><td><code>7201-7203</code></td><td>Dev (BE/FE/AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>7432 / 7379</code></td><td>Main DB / Redis</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
-          <tr><td><code>8432 / 8379</code></td><td>Dev DB / Redis</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>7432</code></td><td>Main PostgreSQL</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>7379 / 7380</code></td><td>Main Redis (BE / AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>8432</code></td><td>Dev PostgreSQL</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
+          <tr><td><code>8379 / 8380</code></td><td>Dev Redis (BE / AI)</td><td>127.0.0.1</td><td><span class="badge-internal">Internal</span></td></tr>
           <tr><td><code>5432 / 6379 / 3306</code></td><td>DB defaults</td><td>-</td><td><span class="badge-forbidden">Forbidden</span></td></tr>
         </tbody>
       </table>

@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SSAFY Infra Dashboard Index</title>
+  <title>SSAFY 인프라 대시보드 인덱스</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <style>
     /* === Design System & Base Styles === */
     :root {
@@ -152,12 +153,11 @@
 
   <main class="container">
     <nav class="main-nav">
-      <a href="#" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
-      <div class="nav-links" id="navLinks">
-        <a href="./index.html" class="nav-link active">Home</a>
-        <a href="./infra-architecture.html" class="nav-link">Architecture</a>
-        <a href="./infra-conventions.html" class="nav-link">Conventions</a>
-        <a href="./infra-dashboard.html" class="nav-link">Status</a>
+      <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links">
+        <a href="dashboard-index.html" class="nav-link active">인덱스</a>
+        <a href="infra-dashboard.html" class="nav-link">대시보드</a>
+        <a href="infra-architecture.html" class="nav-link">아키텍처</a>
       </div>
       <div class="nav-controls">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -172,24 +172,24 @@
     </nav>
     
     <header class="reveal-on-scroll">
-      <h1 class="hero-title">SSAFY A408 Infra Portal</h1>
-      <p class="hero-sub">주니어 개발자 온보딩을 위한 인프라 대시보드입니다. 현재 상태 확인, 개선안 검토, 운영 가이드로 빠르게 이동하세요.</p>
+      <h1 class="hero-title">인프라 대시보드 인덱스</h1>
+      <p class="hero-sub">SSAFY 프로젝트를 위한 인프라 구성 현황, 아키텍처 가이드 및 실시간 상태 정보를 한곳에서 확인하세요.</p>
     </header>
 
     <section class="card-grid">
-      <a href="./infra-dashboard.html" class="card reveal-on-scroll">
+      <a href="infra-dashboard.html" class="card reveal-on-scroll">
         <div class="card-header">
           <div class="card-icon"><svg><use href="#icon-dashboard"></use></svg></div>
-          <h2 class="card-title">Actual Dashboard</h2>
+          <h2 class="card-title">실시간 대시보드</h2>
         </div>
-        <p class="card-desc">현재 운영 상태를 JSON 기반으로 시각화한 실측 대시보드입니다. 실제 health를 확인하여 오판을 줄입니다.</p>
+        <p class="card-desc">현재 EC2 인프라의 핵심 지표(Health, Security, Service Status)와 수동 설치 가이드를 제공합니다.</p>
         <div class="card-footer">
             <span class="status-indicator"><span class="dot"></span>OK</span>
             <span>Live health data</span>
         </div>
       </a>
 
-      <a href="./infra-dashboard-proposal.html" class="card reveal-on-scroll">
+      <a href="infra-dashboard-proposal.html" class="card reveal-on-scroll">
         <div class="card-header">
           <div class="card-icon"><svg><use href="#icon-proposal"></use></svg></div>
           <h2 class="card-title">Proposal Dashboard</h2>
@@ -201,7 +201,7 @@
         </div>
       </a>
 
-      <a href="./infra-architecture.html" class="card reveal-on-scroll">
+      <a href="infra-architecture.html" class="card reveal-on-scroll">
         <div class="card-header">
           <div class="card-icon"><svg><use href="#icon-server"></use></svg></div>
           <h2 class="card-title">Architecture</h2>
@@ -213,7 +213,7 @@
         </div>
       </a>
 
-      <a href="./infra-conventions.html" class="card reveal-on-scroll">
+      <a href="infra-conventions.html" class="card reveal-on-scroll">
         <div class="card-header">
           <div class="card-icon"><svg><use href="#icon-zap"></use></svg></div>
           <h2 class="card-title">Conventions</h2>

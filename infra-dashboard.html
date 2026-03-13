@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SSAFY Infra Dashboard (Manual Setup Guide)</title>
+  <title>SSAFY 인프라 대시보드 (수동 설치 가이드)</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <style>
     /* === Design System & Base Styles === */
     :root {
@@ -82,6 +83,12 @@
     .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); filter: brightness(1.1); }
     
+    /* Spinner Animation */
+    .spinner { animation: rotate 2s linear infinite; display: none; margin-right: 8px; width: 18px; height: 18px; }
+    .refreshing .spinner { display: inline-block; }
+    .refreshing #refreshText { opacity: 0.7; }
+    @keyframes rotate { 100% { transform: rotate(360deg); } }
+
     .tabs-container { display: flex; gap: 16px; border-bottom: 2px solid var(--card-border); margin-bottom: 32px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
     .tabs-container::-webkit-scrollbar { display: none; }
     .tab-btn { padding: 12px 24px; border: none; background: transparent; color: var(--text-muted); border-bottom: 4px solid transparent; margin-bottom: -2px; font-weight: 700; font-size: 1.1rem; cursor: pointer; white-space: nowrap; transition: all var(--transition); }
@@ -195,10 +202,21 @@
     .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
     .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
 
-    /* === Responsive === */
+    /* === Responsive Table to Cards === */
     @media (max-width: 768px) {
       .hero-title { font-size: 2.2rem; }
       .kpi-grid { grid-template-columns: 1fr; }
+      
+      .table-container { border: none; background: transparent; }
+      .table thead { display: none; }
+      .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+      .table tr { background: var(--card-bg); margin-bottom: 16px; border: 1px solid var(--card-border); border-radius: var(--radius); padding: 12px; }
+      .table td { border: none; padding: 8px 4px; display: flex; justify-content: space-between; align-items: flex-start; text-align: right; border-bottom: 1px solid rgba(0,0,0,0.03); }
+      [data-theme="dark"] .table td { border-bottom-color: rgba(255,255,255,0.03); }
+      .table td:last-child { border-bottom: none; }
+      .table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); text-align: left; flex-shrink: 0; margin-right: 16px; }
+      .plan-row .toggle-icon { margin-right: 8px; }
+      
       .tabs-container { padding-bottom: 4px; }
       .tab-btn { padding: 10px 16px; font-size: 1rem; }
       .timeline { padding-left: 32px; }
@@ -211,7 +229,7 @@
   <!-- SVG Icon Definitions -->
   <svg style="display:none">
     <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></symbol>
-    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 0 0 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
     <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></symbol>
     <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></symbol>
     <symbol id="icon-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></symbol>
@@ -245,8 +263,9 @@
     <div class="toolbar">
       <span id="statusMsg">현재 기본값(하드코딩)으로 표시 중</span>
       <button id="refreshBtn" class="btn btn-primary" title="실시간 데이터로 덮어쓰기">
-        <svg style="width:18px;height:18px;stroke:currentColor;"><use href="#icon-refresh"></use></svg>
-        실시간 데이터 가져오기
+        <svg class="spinner" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="5"><circle cx="25" cy="25" r="20" stroke-dasharray="94.2" stroke-linecap="round"></circle></svg>
+        <svg id="refreshIcon" style="width:18px;height:18px;stroke:currentColor;"><use href="#icon-refresh"></use></svg>
+        <span id="refreshText">실시간 데이터 가져오기</span>
       </button>
     </div>
 
@@ -921,12 +940,12 @@ redis-ai-dev:8380</code></pre>
           const note = escapeHtml(String(row.note || row.evidence || "-").slice(0, 90));
           return `
             <tr class="plan-row" tabindex="0" role="button" aria-expanded="false" aria-controls="${detailId}">
-              <td><span class="toggle-icon" aria-hidden="true">▶</span> ${index + 1}</td>
-              <td><strong>${escapeHtml(row.item || "-")}</strong></td>
-              <td>${escapeHtml(row.expected || "-")}</td>
-              <td>${badge(row.actualStatus)}</td>
-              <td>${escapeHtml(row.actualSummary || "-")}</td>
-              <td><code>${note}</code></td>
+              <td data-label="No."><span class="toggle-icon" aria-hidden="true">▶</span> ${index + 1}</td>
+              <td data-label="항목"><strong>${escapeHtml(row.item || "-")}</strong></td>
+              <td data-label="기대결과">${escapeHtml(row.expected || "-")}</td>
+              <td data-label="상태">${badge(row.actualStatus)}</td>
+              <td data-label="결과 요약">${escapeHtml(row.actualSummary || "-")}</td>
+              <td data-label="비고"><code>${note}</code></td>
             </tr>
             <tr class="detail-row" id="${detailId}" aria-hidden="true">
               <td colspan="6" class="detail-cell">
@@ -990,7 +1009,11 @@ redis-ai-dev:8380</code></pre>
       }
       
       async function reloadFromJson() {
+        const btn = document.getElementById("refreshBtn");
+        const icon = document.getElementById("refreshIcon");
         try {
+          btn.classList.add("refreshing");
+          icon.style.display = "none";
           setStatus("실시간 데이터를 가져오는 중...");
           const res = await fetch(`./data/infra-health.json?t=${Date.now()}`, { cache: "no-store" });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -999,6 +1022,9 @@ redis-ai-dev:8380</code></pre>
           setStatus(`마지막 갱신: ${new Date(data.generatedAtUtc).toLocaleString()}`);
         } catch (err) {
           setStatus(`데이터 로드 실패: ${err.message}`, true);
+        } finally {
+          btn.classList.remove("refreshing");
+          icon.style.display = "inline-block";
         }
       }
 

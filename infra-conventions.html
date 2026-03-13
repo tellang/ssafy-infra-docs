@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SSAFY Infra Conventions</title>
+  <title>SSAFY 인프라 컨벤션 & 표준 가이드</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <style>
     :root {
       --bg: #f8fafc; --bg-glass: rgba(248,250,252,0.75);
@@ -32,19 +33,21 @@
       -webkit-font-smoothing: antialiased; transition: background var(--transition), color var(--transition);
     }
     .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    
+    /* Nav */
     .main-nav {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 24px; margin-bottom: 32px;
-      background: var(--bg-glass); backdrop-filter: blur(10px);
+      background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--card-border); border-radius: var(--radius);
       position: sticky; top: 16px; z-index: 100;
     }
     .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
     .nav-logo-accent { color: var(--accent); }
-    .nav-links { display: flex; gap: 16px; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
-    .nav-link:hover { color: var(--text-primary); }
-    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; padding: 6px 10px; transition: all var(--transition); border-radius: 6px; }
+    .nav-link:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+    .nav-link.active { color: white; background: var(--accent); }
     .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
     .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
     .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
@@ -100,22 +103,24 @@
 <body>
   <main class="container">
     <nav class="main-nav">
-      <a href="./index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
       <div class="nav-links">
-        <a href="./index.html" class="nav-link">Home</a>
-        <a href="./infra-architecture.html" class="nav-link">Architecture</a>
-        <a href="./infra-conventions.html" class="nav-link active">Conventions</a>
-        <a href="./infra-dashboard.html" class="nav-link">Status</a>
+        <a href="dashboard-index.html" class="nav-link">인덱스</a>
+        <a href="infra-dashboard.html" class="nav-link">대시보드</a>
+        <a href="infra-architecture.html" class="nav-link">아키텍처</a>
+        <a href="infra-conventions.html" class="nav-link active">컨벤션</a>
       </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
     </nav>
 
-    <header>
-      <h1 class="hero-title">Infrastructure Conventions</h1>
-      <p class="hero-sub">SSAFY A408 팀 인프라 컨벤션 | 모든 팀원이 따라야 하는 규칙</p>
+    <header class="hero">
+      <h1 class="hero-title">인프라 컨벤션 & 표준 가이드</h1>
+      <p class="hero-sub">포트 번호 정책, 환경 변수 명명 규칙 등 SSAFY 프로젝트 인프라 운영의 핵심 규칙을 정의합니다.</p>
     </header>
 
     <div class="toc">
@@ -143,7 +148,7 @@
           <tr><td>Docker 컨테이너</td><td><code>{service}-{env}</code></td><td><code>be-main</code>, <code>fe-dev</code>, <code>ai-main</code></td></tr>
           <tr><td>Docker 이미지</td><td><code>ssafy-{service}</code></td><td><code>ssafy-be:main-latest</code></td></tr>
           <tr><td>DB 인스턴스</td><td><code>postgres-{env}</code></td><td><code>postgres-main</code>, <code>postgres-dev</code></td></tr>
-          <tr><td>Redis 인스턴스</td><td><code>redis-{env}</code></td><td><code>redis-main</code>, <code>redis-dev</code></td></tr>
+          <tr><td>Redis 인스턴스</td><td><code>redis-{role}-{env}</code></td><td><code>redis-be-main</code>, <code>redis-ai-dev</code></td></tr>
           <tr><td>Git 브랜치</td><td><code>{domain}/{channel}</code></td><td><code>be/main</code>, <code>fe/dev</code>, <code>ai/feature/login</code></td></tr>
           <tr><td>Jenkins Job</td><td><code>ssafy-{domain}</code></td><td><code>ssafy-be</code>, <code>ssafy-fe</code>, <code>ssafy-ai</code></td></tr>
           <tr><td>Mattermost 채널</td><td><code>{domain}-deploy</code></td><td><code>be-deploy</code>, <code>fe-deploy</code></td></tr>
@@ -178,7 +183,8 @@
             <tr><td>App - FE</td><td><code>:7102</code></td><td><code>:7202</code></td><td>Frontend</td></tr>
             <tr><td>App - AI</td><td><code>:7103</code></td><td><code>:7203</code></td><td>AI Service</td></tr>
             <tr><td>PostgreSQL</td><td><code>:7432</code></td><td><code>:8432</code></td><td>Database</td></tr>
-            <tr><td>Redis</td><td><code>:7379</code></td><td><code>:8379</code></td><td>Cache/Session</td></tr>
+            <tr><td>Redis (BE)</td><td><code>:7379</code></td><td><code>:8379</code></td><td>BE Cache/Session</td></tr>
+            <tr><td>Redis (AI)</td><td><code>:7380</code></td><td><code>:8380</code></td><td>AI Cache/Vector</td></tr>
             <tr><td>Jenkins</td><td colspan="2"><code>:8080</code></td><td>CI/CD (공유)</td></tr>
           </tbody>
         </table>
@@ -217,7 +223,8 @@
             <tr><td>BE</td><td><code>be-main</code> (:7101)</td><td><code>be-dev</code> (:7201)</td></tr>
             <tr><td>AI</td><td><code>ai-main</code> (:7103)</td><td><code>ai-dev</code> (:7203)</td></tr>
             <tr><td>DB</td><td><code>postgres-main</code> (:7432)</td><td><code>postgres-dev</code> (:8432)</td></tr>
-            <tr><td>Redis</td><td><code>redis-main</code> (:7379)</td><td><code>redis-dev</code> (:8379)</td></tr>
+            <tr><td>Redis (BE)</td><td><code>redis-be-main</code> (:7379)</td><td><code>redis-be-dev</code> (:8379)</td></tr>
+            <tr><td>Redis (AI)</td><td><code>redis-ai-main</code> (:7380)</td><td><code>redis-ai-dev</code> (:8380)</td></tr>
           </tbody>
         </table>
       </div>

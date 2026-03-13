@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SSAFY Infra Proposal (Pre-install Simulation)</title>
+  <title>SSAFY 인프라 대시보드 제안서</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <style>
-    /* === Design System & Base Styles (Proposal Theme) === */
+    /* === Design System & Base Styles === */
     :root {
       --bg: #f8fafc;
       --bg-glass: rgba(248, 250, 252, 0.75);
@@ -50,28 +51,28 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; background-color: var(--bg); background-image: var(--gradient-bg); color: var(--text-primary); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background var(--transition), color var(--transition); }
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
     
-    /* === Navigation === */
-    .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; margin-bottom: 32px; background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--card-border); border-radius: var(--radius); position: sticky; top: 16px; z-index: 100; }
+    /* Nav */
+    .main-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px; margin-bottom: 32px;
+      background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      position: sticky; top: 16px; z-index: 100;
+    }
     .nav-logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text-primary); }
     .nav-logo-accent { color: var(--accent); }
-    .nav-links { display: flex; gap: 16px; align-items: center; }
-    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; padding: 8px 4px; transition: color var(--transition); border-bottom: 2px solid transparent; }
-    .nav-link:hover { color: var(--text-primary); }
-    .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
-    .nav-controls { display: flex; align-items: center; gap: 16px; }
-    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
-    .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); }
-    .theme-toggle { background: transparent; border: none; padding: 6px; cursor: pointer; display: flex; align-items: center; }
-    .theme-toggle svg { width: 20px; height: 20px; stroke: var(--text-secondary); transition: all var(--transition); }
-    .theme-toggle:hover svg { stroke: var(--text-primary); transform: scale(1.1) rotate(15deg); }
-    #iconMoon { display: block; } #iconSun { display: none; }
-    [data-theme="dark"] #iconMoon { display: none; } [data-theme="dark"] #iconSun { display: block; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; padding: 6px 10px; transition: all var(--transition); border-radius: 6px; }
+    .nav-link:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+    .nav-link.active { color: white; background: var(--accent); }
 
     /* === Header & Hero === */
-    .hero-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; background: var(--gradient-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; line-height: 1.2; }
-    .hero-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 16px; max-width: 700px; }
+    .hero {
+        <h1 class="hero-title">인프라 대시보드 프로젝트 제안서</h1>
+        <p class="hero-sub">SSAFY 프로젝트 운영의 효율성을 극대화하기 위한 "실시간 인프라 가시화 및 자동 가이드 도구" 기획안입니다.</p>
+    }
     .chips-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
     .chip { display: inline-block; background: var(--bg-glass); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--card-border); border-radius: 99px; padding: 4px 12px; font-size: 0.8rem; color: var(--text-secondary); }
     .chip a { color: var(--accent); text-decoration: none; font-weight: 500; }
@@ -150,12 +151,12 @@
 
   <div class="container">
     <nav class="main-nav">
-      <a href="./index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
-      <div class="nav-links" id="navLinks">
-        <a href="./index.html" class="nav-link">Home</a>
-        <a href="./infra-architecture.html" class="nav-link">Architecture</a>
-        <a href="./infra-dashboard.html" class="nav-link">Actual Status</a>
-        <a href="./infra-dashboard-proposal.html" class="nav-link active">Proposal</a>
+      <a href="dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links">
+        <a href="dashboard-index.html" class="nav-link">인덱스</a>
+        <a href="infra-dashboard.html" class="nav-link">대시보드</a>
+        <a href="infra-architecture.html" class="nav-link">아키텍처</a>
+        <a href="infra-dashboard-proposal.html" class="nav-link active">제안서</a>
       </div>
       <div class="nav-controls">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -169,9 +170,9 @@
       </div>
     </nav>
     
-    <div>
-      <h1 class="hero-title">Infra Proposal Dashboard</h1>
-      <p class="hero-sub">이 페이지는 <strong>제안서용 시뮬레이션</strong>입니다. 실제 설치를 수행하지 않으며, 설명형 인터랙션으로 학습 흐름을 보여줍니다.</p>
+    <div class="hero">
+      <h1 class="hero-title">인프라 대시보드 프로젝트 제안서</h1>
+      <p class="hero-sub">SSAFY 프로젝트 운영의 효율성을 극대화하기 위한 "실시간 인프라 가시화 및 자동 가이드 도구" 기획안입니다.</p>
     </div>
     <div class="chips-container">
         <span class="chip">Simulation only</span>
