@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SSAFY 운영 대시보드</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-  <script src="assets/ssafy-docs.js"></script>
+  <script src="assets/ssafy-docs.js?v=20260314-3"></script>
   <style>
     .hero {
       text-align: center;
@@ -275,6 +275,7 @@
       border-radius: 16px;
       border: 1px solid var(--card-border);
       background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+      transition: background-color var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition), transform var(--transition);
     }
 
     .summary-card h3,
@@ -355,6 +356,7 @@
       border-radius: 12px;
       border: 1px solid var(--card-border);
       background: var(--bg);
+      transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
     }
 
     .table {
@@ -374,6 +376,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      transition: background-color var(--transition), border-color var(--transition), color var(--transition);
     }
 
     .table thead th {
@@ -395,7 +398,7 @@
     .plan-row.open .toggle-icon { transform: rotate(90deg); }
     .detail-row { display: none; }
     .detail-row.open { display: table-row; }
-    .detail-cell { padding: 0 !important; background: transparent !important; }
+    .detail-cell { padding: 0 !important; background: transparent !important; overflow: visible !important; white-space: normal !important; }
     .detail-content {
       overflow: hidden;
       max-height: 0;
@@ -403,13 +406,20 @@
       background: color-mix(in srgb, var(--accent) 3%, var(--card-bg));
       border-left: 4px solid var(--accent);
       font-size: 0.85rem;
-      transition: all 0.3s ease;
+      white-space: normal;
+      transition: background-color var(--transition), border-color var(--transition), color var(--transition), max-height 0.3s ease, padding 0.3s ease, box-shadow var(--transition);
     }
 
     .detail-content.expanded {
-      padding: 20px 24px;
-      max-height: 1000px;
+      padding: 20px 24px 30px;
+      max-height: 2200px;
+      overflow: visible;
       border-bottom: 1px solid var(--card-border);
+    }
+
+    .detail-content .inline-links {
+      margin-top: 18px;
+      padding-bottom: 6px;
     }
 
     .detail-content pre {
@@ -470,22 +480,6 @@
       .tab-btn { padding: 10px 14px; font-size: 0.96rem; }
     }
 
-    /* === Table & Accordion Fix === */
-    .table-container { overflow: visible !important; border: 1px solid var(--card-border); border-radius: var(--radius); background: var(--card-bg); }
-    .table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .table th, .table td { padding: 18px 24px; text-align: left; border-bottom: 1px solid var(--card-border); vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .plan-row { cursor: pointer; transition: background var(--transition); }
-    .plan-row:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
-    
-    .detail-row { display: none; }
-    .detail-row.open { display: table-row; }
-    .detail-cell { padding: 0 !important; border-bottom: none !important; }
-    .detail-content { overflow: hidden; max-height: 0; background: color-mix(in srgb, var(--accent) 2%, var(--bg)); border-left: 4px solid var(--accent); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .detail-content.expanded { max-height: 2000px; padding: 32px; border-bottom: 1px solid var(--card-border); }
-    
-    /* 제거: 상세 내용 안의 중복 버튼 스타일 */
-    .detail-content button, .detail-content .btn { display: none !important; } 
     .detail-content h4 { color: var(--accent); margin-bottom: 12px; font-size: 1rem; }
     .detail-content pre { margin: 16px 0; background: #0f172a; color: #f8fafc; padding: 20px; border-radius: 12px; font-family: "JetBrains Mono", monospace; font-size: 0.85rem; line-height: 1.6; }
 
@@ -499,7 +493,7 @@
     .nav-link:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
     .nav-link.active { color: white !important; background: var(--accent) !important; box-shadow: 0 4px 12px var(--accent-glow); }
   </style>
-  <link rel="stylesheet" href="assets/ssafy-docs.css" />
+  <link rel="stylesheet" href="assets/ssafy-docs.css?v=20260314-3" />
 </head>
 <body>
   <svg style="display:none">
@@ -925,14 +919,14 @@
         planRow.setAttribute("aria-expanded", "true");
         requestAnimationFrame(() => {
           content.classList.add("expanded");
-          content.style.maxHeight = `${content.scrollHeight}px`;
+          content.style.maxHeight = `${content.scrollHeight + 48}px`;
         });
       }
 
       function closePlanRow(planRow, detailRow) {
         const content = detailRow.querySelector(".detail-content");
         if (!content) return;
-        content.style.maxHeight = `${content.scrollHeight}px`;
+        content.style.maxHeight = `${content.scrollHeight + 48}px`;
         planRow.classList.remove("open");
         planRow.setAttribute("aria-expanded", "false");
         requestAnimationFrame(() => {

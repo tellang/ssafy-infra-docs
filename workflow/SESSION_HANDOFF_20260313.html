@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" data-reload-on-theme-toggle="true">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSAFY 세션 핸드오프 아카이브</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <script src="../assets/ssafy-docs.js?v=20260314-3"></script>
+    <style>
+        h1, h2, h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        header.reveal-on-scroll {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        header.reveal-on-scroll p {
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        .archive-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            background: color-mix(in srgb, var(--accent) 12%, transparent);
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        section.fade-up {
+            margin-bottom: 48px;
+        }
+
+        section.fade-up h2 {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px var(--accent-glow);
+            border-color: var(--accent-light);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .port-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: monospace;
+            background: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent-light);
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .port-main { background: color-mix(in srgb, #10b981 15%, transparent); color: #10b981; }
+        .port-dev { background: color-mix(in srgb, #f59e0b 15%, transparent); color: #f59e0b; }
+
+        .diagram-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 48px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 24px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--card-border);
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .pipeline-step:not(:last-child)::after { display: none; }
+            .pipeline { flex-direction: column; align-items: stretch; }
+            .pipeline-step { margin-bottom: 16px; }
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 12px;
+            z-index: 1;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+    </style>
+    <link rel="stylesheet" href="../assets/ssafy-docs.css?v=20260314-3" />
+</head>
+<body>
+
+<div class="container">
+    <nav class="main-nav">
+      <a href="../dashboard-index.html" class="nav-logo">Infra<span class="nav-logo-accent">.ssafy</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="../dashboard-index.html" class="nav-link">인덱스</a>
+        <a href="../infra-dashboard.html" class="nav-link">대시보드</a>
+        <a href="../infra-architecture.html" class="nav-link">아키텍처</a>
+        <a href="../infra-runbook.html" class="nav-link">운영 가이드</a>
+        <a href="../infra-conventions.html" class="nav-link">컨벤션</a>
+      </div>
+      <div class="nav-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg id="iconHamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg id="iconClose" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </nav>
+
+    <header class="reveal-on-scroll">
+        <h1 class="hero-title">세션 핸드오프 아카이브</h1>
+        <p>이 문서는 2026-03-13 세션 기준의 handoff 산출물입니다. 현재 운영 기준은 대시보드, 아키텍처, 운영 가이드, 컨벤션 문서를 우선 확인합니다.</p>
+        <div class="archive-note">Archive / Handoff</div>
+    </header>
+
+    <section class="fade-up">
+        <h2>네트워크 아키텍처</h2>
+        <div class="diagram-container">
+            <div class="mermaid">
+                flowchart LR
+                    User([User / Browser])
+                    
+                    subgraph "Public Network"
+                        Nginx[Nginx Reverse Proxy\n:80, :443]
+                    end
+                    
+                    subgraph "Internal Services"
+                        FE[Frontend\n:7102 Main / :7202 Dev]
+                        BE[Backend API\n:7101 Main / :7201 Dev]
+                        AI[AI Server\n:7103 Main / :7203 Dev]
+                    end
+                    
+                    subgraph "Data Tier"
+                        DB[(Postgres)]
+                        Cache[(Redis)]
+                    end
+                    
+                    ExtLLM([External LLM API])
+
+                    User -->|HTTPS| Nginx
+                    Nginx -->|Route| FE
+                    Nginx -->|API Route| BE
+                    BE --> AI
+                    AI --> ExtLLM
+                    
+                    BE --> DB
+                    BE --> Cache
+                    AI --> Cache
+            </div>
+        </div>
+    </section>
+
+    <section class="fade-up">
+        <h2>CI/CD 파이프라인 흐름도</h2>
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="step-icon">1</div>
+                <div class="step-title">Git Push / PR</div>
+                <div class="step-desc">코드 변경사항 커밋 및 푸시</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">2</div>
+                <div class="step-title">Jenkins Webhook</div>
+                <div class="step-desc">파이프라인 트리거 (포트: 8080)</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">3</div>
+                <div class="step-title">Build & Test</div>
+                <div class="step-desc">코드 빌드 및 정적 분석, 테스트</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">4</div>
+                <div class="step-title">Deploy</div>
+                <div class="step-desc">Main / Dev 환경에 컨테이너 배포</div>
+            </div>
+        </div>
+        <div class="diagram-container">
+            <div class="mermaid">
+                gitGraph
+                    commit id: "Initial"
+                    branch dev
+                    checkout dev
+                    commit id: "Feature A"
+                    commit id: "Auto Deploy (dev)" tag: "Deploy:dev"
+                    checkout main
+                    merge dev id: "PR Merge" tag: "Deploy:main"
+                    branch feature/auth
+                    checkout feature/auth
+                    commit id: "Test only"
+                    checkout dev
+                    merge feature/auth id: "Auto Deploy (dev) " tag: "Deploy:dev "
+            </div>
+        </div>
+    </section>
+
+    <section class="fade-up">
+        <h2>서비스 포트 및 환경 컨벤션</h2>
+        <p>프로젝트는 Main과 Dev 환경을 포트 번호로 격리하여 운영합니다. 아래는 주요 서비스별 포트 할당 현황입니다.</p>
+        <div class="grid">
+            <div class="card fade-up">
+                <div class="card-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Frontend
+                </div>
+                <div><span class="port-badge port-main">Main: 7102</span></div>
+                <div><span class="port-badge port-dev">Dev: 7202</span></div>
+                <p style="margin-top: 12px; font-size: 0.9rem;">사용자 UI 서빙, Nginx 라우팅</p>
+            </div>
+
+            <div class="card fade-up">
+                <div class="card-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                    Backend
+                </div>
+                <div><span class="port-badge port-main">Main: 7101</span></div>
+                <div><span class="port-badge port-dev">Dev: 7201</span></div>
+                <p style="margin-top: 12px; font-size: 0.9rem;">비즈니스 로직 및 API 제공</p>
+            </div>
+
+            <div class="card fade-up">
+                <div class="card-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    AI Server
+                </div>
+                <div><span class="port-badge port-main">Main: 7103</span></div>
+                <div><span class="port-badge port-dev">Dev: 7203</span></div>
+                <p style="margin-top: 12px; font-size: 0.9rem;">Python AI 모델 인터페이스 및 추론</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="fade-up">
+        <h2>데이터 격리 전략</h2>
+        <div class="diagram-container" style="display: flex; flex-direction: column; align-items: center; gap: 24px;">
+            <div class="grid" style="width: 100%; margin-bottom: 0;">
+                <div class="card">
+                    <div class="card-title">Postgres SQL</div>
+                    <div><span class="port-badge port-main">Main: 7432</span></div>
+                    <div><span class="port-badge port-dev">Dev: 8432</span></div>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">트랜잭션 데이터, 유저 스키마 영속 저장소</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Redis Cache</div>
+                    <div><span class="port-badge port-main">Main: 7379</span></div>
+                    <div><span class="port-badge port-dev">Dev: 8379</span></div>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">세션 상태 관리 및 빠른 조회용 캐시 <b>(용도별이 아닌 환경별 분리)</b></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    const currentTheme = document.documentElement.getAttribute("data-theme") || window.SsafyDocs.getTheme();
+
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: currentTheme === "dark" ? "dark" : "default",
+        securityLevel: "loose",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif"
+    });
+</script>
+
+</body>
+</html>
